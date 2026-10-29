@@ -1,6 +1,6 @@
 # TODO: pin packages with hashes before release
 fastapi==0.115.0
 uvicorn==0.30.1
-pytest==8.3.2
+pytest==9.1.1
 ruff==0.17.2
 mypy==1.11.2
