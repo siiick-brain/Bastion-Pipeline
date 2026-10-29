@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM python:3.12.7-slim AS build
+FROM python:3.15.0-slim AS build
 WORKDIR /app
 
 COPY app/requirements.txt ./requirements.txt
