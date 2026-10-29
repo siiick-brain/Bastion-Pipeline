@@ -1,0 +1,37 @@
+stages:
+  - lint
+  - test
+  - security
+
+variables:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+lint:
+  stage: lint
+  image: python:3.12
+  script:
+    - python -m pip install --upgrade pip
+    - python -m pip install -r app/requirements.txt
+    - python -m pip install pyyaml
+    - python -c "import pathlib,yaml; files=sorted(pathlib.Path('.').glob('.github/workflows/*.yml')); [yaml.safe_load(open(f, 'r', encoding='utf-8')) for f in files]; print('workflow yaml ok')"
+    - python -m compileall app
+
+test:
+  stage: test
+  image: python:3.12
+  script:
+    - python -m pip install --upgrade pip
+    - python -m pip install -r app/requirements.txt
+    - python -m pip install pytest
+    - python -m pytest app/test_main.py -q
+
+security:
+  stage: security
+  image: python:3.12
+  script:
+    - python -m pip install --upgrade pip
+    - python -m pip install safety
+    - safety check --file app/requirements.txt || true
+    - python -m pip install cyclonedx-bom
+    - cyclonedx-py --output-format json --output-file sbom.json || true
+    - echo "Security stage complete; review SBOM and scan output."

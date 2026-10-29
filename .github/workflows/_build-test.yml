@@ -1,0 +1,44 @@
+name: build-test
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: '3.12'
+      coverage-threshold:
+        required: false
+        type: number
+        default: 85
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r app/requirements.txt
+          python -m pip install pytest-cov ruff
+
+      - name: Lint
+        run: |
+          ruff check app --select E9,F63,F7,F82
+
+      - name: Test with coverage
+        run: |
+          python -m pytest app --cov=app --cov-report=term-missing --cov-fail-under=${{ inputs.coverage-threshold }}

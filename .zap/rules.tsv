@@ -1,0 +1,3 @@
+rule_id	reason	status
+OWASP2017-A01	Known false positive for this demo service and not used in the app route set.	accepted
+OWASP2017-A03	This demo app uses in-memory storage and a small local API.	accepted

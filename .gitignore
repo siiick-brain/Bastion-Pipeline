@@ -1,0 +1,50 @@
+# Local environment and tool settings
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
+
+.vscode/
+.agents/
+.claude/
+.cursor/
+.windsurf/
+.continue/
+skills/
+prompts/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.github/copilot-instructions.md
+
+# build and package output
+build/
+dist/
+coverage.xml
+*.egg-info/
+*.pyc
+*.pyo
+*.swp
+
+# Terraform and cloud artifacts
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+
+# CI and local tool output
+artifacts/
+logs/
+
+# Local secrets
+secrets/
+private/

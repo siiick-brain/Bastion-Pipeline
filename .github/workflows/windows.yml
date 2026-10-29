@@ -1,0 +1,31 @@
+name: windows
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install PowerShell modules
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Run Windows build
+        shell: pwsh
+        run: |
+          Set-Location $env:GITHUB_WORKSPACE
+          ./windows/build.ps1 -Version 0.1.0 -BuildNumber $env:GITHUB_RUN_NUMBER -OutputDir ./artifacts
