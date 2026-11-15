@@ -1,6 +1,6 @@
 # Deliberately naive single-stage image. Used only for the Trivy comparison in docs/hardening.md.
 # Never deploy this image.
-FROM python:3.11
+FROM python:3.13
 WORKDIR /app
 COPY app/requirements-dev.txt app/requirements.txt ./
 RUN pip install -r requirements-dev.txt
