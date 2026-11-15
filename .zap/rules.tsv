@@ -1,3 +1,2 @@
-rule_id	reason	status
-OWASP2017-A01	Known false positive for this demo service and not used in the app route set.	accepted
-OWASP2017-A03	This demo app uses in-memory storage and a small local API.	accepted
+# ZAP rule configuration: <rule id>	<IGNORE|INFO|WARN|FAIL>	<name and justification>. Each entry is mirrored in security/exceptions.toml.
+10049	IGNORE	(Non-Storable Content) Intended: every response sets Cache-Control no-store so nothing is cached. See EX-003.

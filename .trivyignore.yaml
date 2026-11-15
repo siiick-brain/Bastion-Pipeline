@@ -1,0 +1,16 @@
+# Trivy exceptions. Every entry must also be listed in security/exceptions.toml with owner and expiry.
+# Trivy stops honouring an entry after expired_at, so an expired exception fails the gate.
+vulnerabilities: []
+misconfigurations:
+  - id: AVD-DS-0002
+    paths: ["Dockerfile.naive"]
+    statement: Deliberately naive comparison image, never built in release or deployed. See security/exceptions.toml EX-001.
+    expired_at: 2027-05-15
+  - id: AVD-DS-0026
+    paths: ["Dockerfile.naive", "Dockerfile"]
+    statement: No HEALTHCHECK in image; health is probed by Kubernetes and Compose. See security/exceptions.toml EX-002.
+    expired_at: 2027-05-15
+  - id: AVD-DS-0002
+    paths: ["infra/jenkins/Dockerfile.agent"]
+    statement: sshd must start as root to drop privileges per session; builds run as the jenkins user. See security/exceptions.toml EX-004.
+    expired_at: 2027-05-15

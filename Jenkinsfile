@@ -1,33 +1,76 @@
+// Bastion Pipeline on Jenkins. Implements the pipeline contract stages that need no container
+// runtime (docs/pipeline-contract.md). Container build, signing, provenance and release are
+// owned by GitHub Actions because the Jenkins agent deliberately has no Docker access.
 pipeline {
-  agent any
-
+  agent { label 'linux-isolated' }
+  options {
+    timeout(time: 30, unit: 'MINUTES')
+    timestamps()
+    disableConcurrentBuilds()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+  environment {
+    PIP_DISABLE_PIP_VERSION_CHECK = '1'
+    PYTHONDONTWRITEBYTECODE = '1'
+    // SSH sessions do not inherit the image ENV, so add the agent's locked tool venv explicitly.
+    PATH = "/opt/venv/bin:/usr/local/bin:/usr/bin:/bin"
+  }
   stages {
-    stage('Setup') {
+    stage('Source validation') {
       steps {
-        sh 'python3 --version'
-        sh 'python3 -m pip install --upgrade pip'
-        sh 'python3 -m pip install -r app/requirements.txt'
-        sh 'python3 -m pip install pytest pyyaml'
+        deleteDir()
+        script {
+          if (fileExists('/src/Jenkinsfile')) {
+            // Local demonstration: copy the read-only source mount, excluding local tool state.
+            sh '''
+              set -eu
+              tar --exclude=./.venv --exclude=./artifacts --exclude=./zap-out --exclude='*/__pycache__' \
+                  --exclude=./infra/jenkins/secrets -C /src -cf - . | tar -xf -
+              git config --global --add safe.directory "$PWD"
+            '''
+          } else {
+            checkout scm
+          }
+        }
+        sh 'git log -1 --format="commit %H by %an"'
+        // Same rule as GitHub CI: check only commits that are new since the last good state.
+        sh '''
+          base="${GIT_PREVIOUS_SUCCESSFUL_COMMIT:-$(git rev-parse --verify -q origin/main || git rev-parse HEAD~1)}"
+          echo "Checking commits in ${base}..HEAD"
+          bash scripts/check-authorship.sh "${base}..HEAD"
+        '''
       }
     }
     stage('Lint') {
       steps {
-        sh "python3 -c \"import pathlib,yaml; files=sorted(pathlib.Path('.github/workflows').glob('*.yml')); [yaml.safe_load(open(f, 'r', encoding='utf-8')) for f in files]; print('workflow yaml ok')\""
-        sh 'python3 -m compileall app'
+        sh 'python -m ruff check . --no-cache'
+        sh 'python -m ruff format --check . --no-cache'
+        sh 'python -m mypy app scripts/oidc scripts/release update-signing/bastion_update firmware-sim/boot_sim.py --cache-dir=/tmp/mypy'
+        sh 'python -m yamllint --strict .'
       }
     }
-    stage('Test') {
+    stage('Unit tests and coverage gate') {
       steps {
-        sh 'python3 -m pytest app/test_main.py -q'
+        sh 'python -m pytest -p no:cacheprovider --cov --cov-report=term --cov-report=xml:coverage.xml --cov-fail-under=85 --junitxml=junit.xml'
+      }
+      post {
+        always { junit 'junit.xml' }
       }
     }
-    stage('Security') {
+    stage('Secret scan') {
       steps {
-        sh 'python3 -m pip install safety'
-        sh 'safety check --file app/requirements.txt || true'
-        sh 'python3 -m pip install cyclonedx-bom'
-        sh 'cyclonedx-py --output-format json --output-file sbom.json || true'
+        sh 'gitleaks dir . --redact --no-banner --exit-code 1'
       }
+    }
+    stage('Dependency analysis') {
+      steps {
+        sh 'osv-scanner scan source --config osv-scanner.toml -L app/requirements.txt -L app/requirements-dev.txt -L update-signing/requirements.txt'
+      }
+    }
+  }
+  post {
+    always {
+      archiveArtifacts artifacts: 'coverage.xml,junit.xml', allowEmptyArchive: true
     }
   }
 }

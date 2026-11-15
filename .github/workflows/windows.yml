@@ -1,31 +1,61 @@
 name: windows
 
+# Windows lint, Pester and packaging (spec item 2). Module versions are pinned.
+
 on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: windows-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   windows-build:
-    runs-on: windows-latest
+    runs-on: windows-2025
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Install PowerShell modules
+      - name: Install pinned PowerShell modules
         shell: pwsh
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
-          Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Force
+          Install-Module Pester -RequiredVersion 6.2.0 -Scope CurrentUser -Force -SkipPublisherCheck
 
-      - name: Run Windows build
+      - name: Build with PowerShell 7 (lint, Pester, package, checksums)
+        shell: pwsh
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: ./windows/build.ps1 -Version 0.1.0 -BuildNumber $env:RUN_NUMBER -OutputDir ./artifacts/windows
+
+      - name: Batch wrapper propagates a failing exit code
         shell: pwsh
         run: |
-          Set-Location $env:GITHUB_WORKSPACE
-          ./windows/build.ps1 -Version 0.1.0 -BuildNumber $env:GITHUB_RUN_NUMBER -OutputDir ./artifacts
+          cmd.exe /d /c "windows\build.bat -Version not-a-version -SkipChecks"
+          if ($LASTEXITCODE -eq 0) { throw 'build.bat returned 0 for invalid input' }
+          Write-Host "build.bat returned $LASTEXITCODE as expected"
+          $global:LASTEXITCODE = 0
+
+      - name: Verify checksums
+        shell: pwsh
+        run: |
+          Import-Module ./windows/BastionBuild.psm1
+          if (-not (Test-Checksum -ChecksumPath ./artifacts/windows/SHA256SUMS)) { throw 'checksum mismatch' }
+
+      - name: Upload package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows-package
+          path: artifacts/windows
+          retention-days: 14

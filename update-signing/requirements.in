@@ -1,0 +1,6 @@
+# Container dependencies for PKCS#11 signing. Lock with:
+# uv pip compile --python-platform x86_64-manylinux_2_28 --python-version 3.13 --generate-hashes requirements.in -o requirements.txt
+python-pkcs11
+cryptography
+pytest
+pytest-cov

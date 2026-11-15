@@ -1,0 +1,43 @@
+# Vulnerability and misconfiguration exception register.
+# The release gate (scripts/release/gate.py) refuses expired or incomplete entries.
+# Required keys: id, finding, scope, reason, risk, owner, expires (YYYY-MM-DD). Optional: compensating.
+
+[[exception]]
+id = "EX-001"
+finding = "AVD-DS-0002 (image runs as root)"
+scope = "Dockerfile.naive"
+reason = "Intentionally naive image used only for the Trivy before and after comparison."
+risk = "None in delivery: the file is never built by release, CI image jobs or deployment."
+owner = "siiick-brain"
+expires = "2027-05-15"
+compensating = "CI builds only Dockerfile; the gate scans the released image digest."
+
+[[exception]]
+id = "EX-002"
+finding = "AVD-DS-0026 (no HEALTHCHECK instruction)"
+scope = "Dockerfile, Dockerfile.naive"
+reason = "The distroless runtime has no shell or curl. Health is probed by the orchestrator."
+risk = "Low: Docker without Compose will not mark the container unhealthy."
+owner = "siiick-brain"
+expires = "2027-05-15"
+compensating = "Kubernetes liveness and readiness probes and the Compose healthcheck call /health."
+
+[[exception]]
+id = "EX-003"
+finding = "ZAP-10049 (Non-Storable Content)"
+scope = "ZAP baseline and full scans of the notes service"
+reason = "Informational alert reporting that responses are not cacheable. This is the intended effect of Cache-Control no-store."
+risk = "None: the alert confirms a control rather than a weakness."
+owner = "siiick-brain"
+expires = "2027-05-15"
+compensating = "app/test_main.py::test_security_headers_on_every_response asserts the header on every response."
+
+[[exception]]
+id = "EX-004"
+finding = "AVD-DS-0002 (image runs as root)"
+scope = "infra/jenkins/Dockerfile.agent"
+reason = "The SSH agent image starts sshd as root so it can drop to the jenkins user for each session. Build steps run as jenkins."
+risk = "Medium: an sshd vulnerability would run as root inside the agent container. The container has no Docker socket, no published ports and no-new-privileges."
+owner = "siiick-brain"
+expires = "2027-05-15"
+compensating = "Agent is reachable only on the internal Compose network; host key pinned; controller secrets masked."

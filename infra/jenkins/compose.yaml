@@ -1,0 +1,65 @@
+# Local Jenkins: controller plus one isolated SSH agent.
+# - No container mounts /var/run/docker.sock.
+# - The UI binds to 127.0.0.1 only. The agent publishes no ports.
+# - Secrets are files under infra/jenkins/secrets/ (gitignored), created by setup.sh.
+name: bastion-jenkins
+services:
+  controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.controller
+    ports:
+      - "127.0.0.1:${JENKINS_PORT:-8080}:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ../../Jenkinsfile:/src/Jenkinsfile:ro
+      - ./secrets/known_hosts:/var/jenkins_home/.ssh/known_hosts:ro
+    secrets: [jenkins_admin_password, agent_ssh_key]
+    security_opt: ["no-new-privileges:true"]
+    networks: [jenkins]
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://127.0.0.1:8080/login"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+  agent:
+    build:
+      context: ../../app
+      dockerfile: ../infra/jenkins/Dockerfile.agent
+    # Install the pinned host key with strict permissions and serve only that key.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >-
+        install -m 0600 /run/secrets/agent_host_key /etc/ssh/ssh_host_ed25519_key &&
+        echo 'HostKey /etc/ssh/ssh_host_ed25519_key' >> /etc/ssh/sshd_config &&
+        export JENKINS_AGENT_SSH_PUBKEY="$$(cat /run/secrets/agent_ssh_pub)" &&
+        exec setup-sshd
+    volumes:
+      - ../../:/src:ro
+      - agent_work:/home/jenkins/agent
+    # Mask the controller's secrets inside the source mount: a compromised build must not be
+    # able to read the admin password or the controller's SSH private key.
+    tmpfs:
+      - /src/infra/jenkins/secrets:ro,size=1k
+    secrets: [agent_ssh_pub, agent_host_key]
+    security_opt: ["no-new-privileges:true"]
+    networks: [jenkins]
+    mem_limit: 2g
+volumes:
+  jenkins_home:
+  agent_work:
+networks:
+  jenkins:
+    name: bastion-jenkins
+secrets:
+  jenkins_admin_password:
+    file: ./secrets/admin_password
+  agent_ssh_key:
+    file: ./secrets/agent_ssh_key
+  agent_ssh_pub:
+    file: ./secrets/agent_ssh_key.pub
+  agent_host_key:
+    file: ./secrets/agent_host_key

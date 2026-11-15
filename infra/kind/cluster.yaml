@@ -1,0 +1,15 @@
+# Local demonstration cluster. The API server listens on 127.0.0.1 only and no host ports
+# are mapped, so nothing in the cluster is reachable from the network.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: bastion
+networking:
+  apiServerAddress: "127.0.0.1"
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"
+nodes:
+  - role: control-plane
+    # From the kind v0.33.0 release notes.
+    image: kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0

@@ -1,0 +1,10 @@
+# Trust policy for scripts/oidc/verifier.py. A cloud provider expresses the same rules in a
+# role trust policy (see docs/oidc.md). Only the main branch in the oidc-demo environment of
+# this repository is trusted.
+audience = "bastion-pipeline-demo"
+repository = "siiick-brain/Bastion-Pipeline"
+repository_owner = "siiick-brain"
+refs = ["refs/heads/main"]
+environments = ["oidc-demo"]
+event_names = ["push", "workflow_dispatch"]
+job_workflow_ref_prefix = "siiick-brain/Bastion-Pipeline/.github/workflows/oidc-demo.yml@"

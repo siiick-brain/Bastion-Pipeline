@@ -1,0 +1,6 @@
+# zizmor configuration. Each disabled audit carries a reason.
+rules:
+  self-repository:
+    # The './' form for local reusable workflows is documented and supported; the '$/' form
+    # is not yet verified for this project. Re-evaluate on the next zizmor upgrade.
+    disable: true

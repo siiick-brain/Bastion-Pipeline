@@ -1,0 +1,87 @@
+name: scheduled-scans
+
+# Weekly deep scans (spec item 6). These are advisory: they open no pull request gate,
+# but a failure turns the scheduled run red and is triaged in docs/exceptions.md.
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: scheduled-scans
+  cancel-in-progress: false
+
+jobs:
+  dependency-check:
+    name: OWASP Dependency-Check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Dependency-Check (NVD key optional)
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          mkdir -p odc-out
+          key_args=()
+          if [ -n "$NVD_API_KEY" ]; then key_args=(--nvdApiKey "$NVD_API_KEY"); fi
+          docker run --rm -e NVD_API_KEY -v "$PWD:/src:ro" -v "$PWD/odc-out:/report" \
+            owasp/dependency-check@sha256:0e8f69ad5b00d62000937f4e57189812343f6903d9c83ee712012d51542a020a \
+            --scan /src/app --project bastion-pipeline --format HTML --format JSON \
+            --out /report --failOnCVSS 7 --enableExperimental "${key_args[@]}"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: dependency-check
+          path: odc-out
+          retention-days: 30
+
+  osv-full:
+    name: OSV full scan (all lock files and the image)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build image
+        run: docker build -t bastion-pipeline:scan .
+      - name: OSV-Scanner source and image
+        run: |
+          docker save bastion-pipeline:scan -o image.tar
+          docker run --rm -v "$PWD:/src:ro" \
+            ghcr.io/google/osv-scanner@sha256:f7ba4be68bac8086b1f88fd598fdca1ca67239c79ad2c2b5c78e03a82e5187c4 \
+            scan source -r --config /src/osv-scanner.toml /src
+          docker run --rm -v "$PWD:/src:ro" \
+            ghcr.io/google/osv-scanner@sha256:f7ba4be68bac8086b1f88fd598fdca1ca67239c79ad2c2b5c78e03a82e5187c4 \
+            scan image --archive /src/image.tar
+
+  zap-full:
+    name: ZAP full scan (local container only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: docker compose up -d --build --wait
+      - run: bash scripts/zap-scan.sh full http://app:8000 zap-full
+      - if: always()
+        run: docker compose down -v
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: zap-full
+          path: zap-out
+          retention-days: 30

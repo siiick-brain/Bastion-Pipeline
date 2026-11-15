@@ -1,16 +1,160 @@
 name: ci
 
+# Pull request and main branch gate. Runs untrusted pull request code with a read-only token
+# and no secrets. Uses pull_request (never pull_request_target).
+
 on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  policy:
+    name: policy (authorship, style, workflow and config lint)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Authorship and commit titles (new commits only)
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BASE_SHA" ]; then
+            range="$HEAD_SHA~1..$HEAD_SHA"
+          else
+            range="$BASE_SHA..$HEAD_SHA"
+          fi
+          bash scripts/check-authorship.sh "$range"
+
+      - name: Style check
+        shell: pwsh
+        run: ./scripts/check-style.ps1
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install locked tools
+        run: python -m pip install --require-hashes --no-deps -r app/requirements-dev.txt
+
+      - name: yamllint
+        run: python -m yamllint --strict .
+
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+
+      - name: zizmor (workflow security audit)
+        run: zizmor --min-severity low --format github .github/workflows
+
+      - name: shellcheck
+        run: shellcheck -x scripts/hooks/commit-msg scripts/*.sh scripts/lib/*.sh
+
+      - name: hadolint (v2.14.0)
+        run: docker run --rm -i hadolint/hadolint@sha256:27086352fd5e1907ea2b934eb1023f217c5ae087992eb59fde121dce9c9ff21e hadolint - < Dockerfile
+
   build-test:
     uses: ./.github/workflows/_build-test.yml
+    permissions:
+      contents: read
     with:
       python-version: '3.12'
       coverage-threshold: 85
+
+  container:
+    name: container (build, runtime tests, image scan)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      BASTION_IMAGE: bastion-pipeline:ci
+      BASTION_REQUIRE_DOCKER: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        run: docker build --pull=false -t "$BASTION_IMAGE" .
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Runtime tests against the running container
+        run: |
+          python -m pip install --require-hashes --no-deps -r app/requirements-dev.txt
+          python -m pytest tests/integration -m integration -v
+
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          version: v0.76.2
+          cache: true
+
+      - name: Trivy image gate (critical and high)
+        run: |
+          trivy image --scanners vuln,secret --severity CRITICAL,HIGH --exit-code 1 \
+            --ignorefile .trivyignore.yaml --format table "$BASTION_IMAGE"
+          trivy image --scanners vuln --format json -o trivy-image.json "$BASTION_IMAGE"
+
+      - name: Upload scan evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: container-evidence
+          path: trivy-image.json
+          retention-days: 30
+          if-no-files-found: warn
+
+  manifests:
+    name: manifests (kustomize, kubeconform, Trivy config)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Render overlays
+        run: |
+          mkdir -p rendered
+          for o in dev prod; do kubectl kustomize "deploy/overlays/$o" > "rendered/$o.yaml"; done
+
+      - name: kubeconform
+        run: |
+          docker run --rm -v "$PWD/rendered:/r:ro" \
+            ghcr.io/yannh/kubeconform@sha256:85dbef6b4b312b99133decc9c6fc9495e9fc5f92293d4ff3b7e1b30f5611823c \
+            -strict -summary -kubernetes-version 1.35.0 -ignore-missing-schemas /r
+
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          version: v0.76.2
+          cache: true
+
+      - name: Trivy config gate
+        run: trivy config --severity CRITICAL,HIGH,MEDIUM --exit-code 1 rendered deploy infra Dockerfile

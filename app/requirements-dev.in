@@ -1,0 +1,15 @@
+# Development and CI dependencies. Lock with: uv pip compile --universal --python-version 3.11 --generate-hashes requirements-dev.in -o requirements-dev.txt
+-c requirements.txt
+fastapi
+uvicorn
+httpx2
+pytest
+pytest-cov
+hypothesis
+ruff
+mypy
+yamllint
+zizmor
+pyjwt[crypto]
+cryptography
+spdx-tools

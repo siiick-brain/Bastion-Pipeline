@@ -1,10 +1,8 @@
 # Update signing
 
-This folder contains the PKCS#11 and SoftHSM2 flow for signed update packages.
+PKCS#11 signing of update packages with SoftHSM2, verification with anti-rollback and atomic installation. SoftHSM is a software token, not hardware. Details and evidence: [PKCS#11 and SoftHSM](../docs/pkcs11-softhsm.md).
 
-## Planned proof
-
-- SoftHSM2 token generation with a per-run PIN.
-- EC P-256 key generation on a non-extractable token.
-- Manifest signing and verification checks.
-- Negative tests for downgrade, tampering and invalid signatures.
+```powershell
+docker build -t bastion-update-signing:local .
+docker run --rm --read-only --tmpfs /tmp:rw,mode=1777 --tmpfs /home/signer:rw,uid=10001,gid=10001 --cap-drop ALL bastion-update-signing:local
+```

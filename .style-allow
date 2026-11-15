@@ -1,0 +1,4 @@
+# Exceptions to docs/STYLE.md. Format: <path glob>|<rule id or *>|<reason>
+LICENSE|*|Standard MIT license text is quoted verbatim.
+tests/style/bad.md|*|Fixture that must fail the style rules.
+CODE_OF_CONDUCT.md|*|Adopted text, quoted verbatim.

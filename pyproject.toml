@@ -1,0 +1,48 @@
+[project]
+name = "bastion-pipeline"
+version = "0.1.0"
+description = "Secure delivery pipeline demonstration"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["app", "tests", "update-signing", "firmware-sim", "scripts"]
+addopts = "-q --strict-markers -m \"not integration and not network\""
+pythonpath = [".", "update-signing", "firmware-sim"]
+markers = ["integration: needs Docker and a built image", "network: needs internet and cosign"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source = ["app", "update-signing", "firmware-sim", "scripts"]
+omit = [
+  "*/test_*.py", "*/tests/*", "*/conftest.py",
+  # Needs a PKCS#11 token; covered by the update-signing container job instead.
+  "update-signing/bastion_update/pkcs11_signer.py", "update-signing/build_update.py",
+]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "BLE", "A", "C4", "SIM", "RUF", "PT"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert, use fixture secrets and run fixed subprocess commands.
+"**/test_*.py" = ["S101", "S105", "S106", "S603", "S607"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+# python-pkcs11 ships no type information and is installed only in the signing container.
+module = ["pkcs11", "pkcs11.*"]
+ignore_missing_imports = true

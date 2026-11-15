@@ -1,11 +1,11 @@
 # Security policy
 
-This project is a hardened pipeline demo. The main branch is expected to contain no deliberate vulnerabilities.
+This repository demonstrates secure delivery practices. It is not a production service.
 
 ## Reporting a vulnerability
 
-Open a private security report through the repository security contact and do not post details in public issues.
+Use GitHub private vulnerability reporting on this repository. Do not open a public issue.
 
 ## Handling
 
-Reports are triaged with the same gates used by the release pipeline. The code is not deployment ready until the checks pass.
+Findings go through the same gates as code changes. Accepted findings are recorded in `security/exceptions.toml` with a reason, risk, owner and expiry. The release gate refuses expired entries.

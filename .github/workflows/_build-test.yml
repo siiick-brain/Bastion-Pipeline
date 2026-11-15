@@ -1,5 +1,8 @@
 name: build-test
 
+# Reusable lint and test stage (pipeline contract stages 2 and 3).
+# Callers cannot widen permissions: every job declares its own minimal set.
+
 on:
   workflow_call:
     inputs:
@@ -11,34 +14,66 @@ on:
         required: false
         type: number
         default: 85
+    outputs:
+      coverage:
+        description: Total line and branch coverage percentage
+        value: ${{ jobs.lint-and-test.outputs.coverage }}
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      coverage: ${{ steps.cov.outputs.total }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ inputs.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r app/requirements.txt
-          python -m pip install pytest-cov ruff
+      - name: Install locked dependencies (hash-checked)
+        run: python -m pip install --require-hashes --no-deps -r app/requirements-dev.txt
 
-      - name: Lint
-        run: |
-          ruff check app --select E9,F63,F7,F82
+      - name: Ruff lint
+        run: python -m ruff check . --output-format=github
 
-      - name: Test with coverage
+      - name: Ruff format
+        run: python -m ruff format --check .
+
+      - name: Mypy
+        run: python -m mypy app scripts/oidc update-signing/bastion_update firmware-sim/boot_sim.py scripts/release
+
+      - name: Tests with coverage gate
+        env:
+          THRESHOLD: ${{ inputs.coverage-threshold }}
         run: |
-          python -m pytest app --cov=app --cov-report=term-missing --cov-fail-under=${{ inputs.coverage-threshold }}
+          python -m pytest --cov --cov-report=term --cov-report=json:coverage.json \
+            --cov-fail-under="$THRESHOLD" --junitxml=junit.xml
+
+      - name: Record coverage
+        id: cov
+        if: always()
+        run: |
+          if [ -f coverage.json ]; then
+            python -c "import json;print('total=%.2f' % json.load(open('coverage.json'))['totals']['percent_covered'])" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-evidence
+          path: |
+            coverage.json
+            junit.xml
+          retention-days: 30
+          if-no-files-found: warn

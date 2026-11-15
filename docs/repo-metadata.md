@@ -1,20 +1,9 @@
 # Repository metadata
 
-This document stores the project summary and topic list that can be used in the GitHub repository settings.
+## Description
 
-## Planned description
+Secure software delivery pipeline: hash-locked builds, hardened container, SBOMs, keyless signing, provenance verification, release gate, GitOps on kind and signed updates with PKCS#11. Evidence-backed, with negative tests.
 
-Hardened pipeline demo for a FastAPI app, Windows packaging, GitOps deployment and signed update flows.
+## Topics
 
-## Planned topics
-
-- security
-- pipeline
-- devops
-- github-actions
-- gitlab
-- jenkins
-- kubernetes
-- terraform
-- sbom
-- signing
+devsecops, supply-chain-security, sigstore, cosign, slsa, sbom, github-actions, gitlab-ci, jenkins, kubernetes, argocd, gitops, oidc, pkcs11, softhsm

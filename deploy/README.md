@@ -1,10 +1,3 @@
-# Deployment automation
+# Deployment manifests
 
-This folder groups release and GitOps deployment assets.
-
-## Planned proof
-
-- Hardened image delivery and signing.
-- GitOps manifests with ArgoCD automation.
-- Promotion scripts for the dev overlay.
-- Verify steps for digests and signatures.
+`base/` holds the hardened namespace, deployment, service and network policies. `overlays/dev` and `overlays/prod` pin the image by digest; `scripts/promote.ps1` sets the digest after verifying the signature. See [GitOps](../docs/gitops.md).

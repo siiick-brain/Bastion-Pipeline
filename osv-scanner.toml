@@ -1,0 +1,2 @@
+# OSV-Scanner configuration. Ignored vulnerabilities need an entry in security/exceptions.toml
+# and an ignoreUntil date. None are accepted today.

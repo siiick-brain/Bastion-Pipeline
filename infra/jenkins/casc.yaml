@@ -1,0 +1,61 @@
+# Jenkins Configuration as Code. Secrets come from files mounted by Compose (never from source).
+jenkins:
+  systemMessage: "Bastion Pipeline local demonstration. The controller runs no builds."
+  numExecutors: 0
+  mode: EXCLUSIVE
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: "${readFile:/run/secrets/jenkins_admin_password}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  disableRememberMe: true
+  crumbIssuer: "standard" # CSRF protection
+  nodes:
+    - permanent:
+        name: isolated-agent
+        labelString: linux-isolated
+        numExecutors: 1
+        remoteFS: /home/jenkins/agent
+        launcher:
+          ssh:
+            host: agent
+            port: 22
+            credentialsId: agent-ssh-key
+            launchTimeoutSeconds: 60
+            maxNumRetries: 10
+            retryWaitTime: 5
+            # Verifies the agent host key against the pinned known_hosts written by setup.sh.
+            sshHostKeyVerificationStrategy: "knownHostsFileKeyVerificationStrategy"
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: agent-ssh-key
+              username: jenkins
+              description: Generated per setup by infra/jenkins/setup.sh
+              privateKeySource:
+                directEntry:
+                  privateKey: "${readFile:/run/secrets/agent_ssh_key}"
+security:
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+unclassified:
+  location:
+    url: http://127.0.0.1:8080/
+jobs:
+  - script: >
+      pipelineJob('bastion-pipeline') {
+        description('Runs the repository Jenkinsfile against the read-only source mount.')
+        definition {
+          cps {
+            script(new File('/src/Jenkinsfile').text)
+            sandbox(true)
+          }
+        }
+      }

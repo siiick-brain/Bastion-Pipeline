@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: bastion
+labels:
+  - pairs:
+      app.kubernetes.io/name: bastion-notes
+      app.kubernetes.io/part-of: bastion-pipeline
+    includeSelectors: true
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+  - networkpolicy.yaml

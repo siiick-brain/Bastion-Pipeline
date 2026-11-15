@@ -1,8 +1,14 @@
+<#
+.SYNOPSIS
+    Returns build metadata. Contains no absolute paths so it is safe to ship.
+#>
+[CmdletBinding()]
 param(
     [string]$Version = '0.1.0',
     [string]$BuildNumber = (Get-Date -Format 'yyyyMMddHHmmss')
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 if ([string]::IsNullOrWhiteSpace($Version)) {
@@ -14,20 +20,16 @@ $branch = ''
 $commit = ''
 
 if (Get-Command git -ErrorAction SilentlyContinue) {
-    try {
-        $branch = (& git -C $repoRoot rev-parse --abbrev-ref HEAD 2>$null)
-        $commit = (& git -C $repoRoot rev-parse --short HEAD 2>$null)
-    } catch {
-        $branch = ''
-        $commit = ''
-    }
+    $branch = (& git -C $repoRoot rev-parse --abbrev-ref HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0) { $branch = '' }
+    $commit = (& git -C $repoRoot rev-parse HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0) { $commit = '' }
 }
 
 [pscustomobject]@{
-    Version = $Version
-    BuildNumber = $BuildNumber
+    Version      = $Version
+    BuildNumber  = $BuildNumber
     TimestampUtc = (Get-Date).ToUniversalTime().ToString('o')
-    Branch = $branch
-    Commit = $commit
-    RepoRoot = $repoRoot
+    Branch       = "$branch"
+    Commit       = "$commit"
 }

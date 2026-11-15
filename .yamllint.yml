@@ -1,0 +1,17 @@
+extends: default
+ignore: |
+  .venv/
+  rendered/
+  zap-out/
+  artifacts/
+  infra/argocd/vendor/
+rules:
+  line-length:
+    max: 200
+  document-start: disable
+  truthy:
+    allowed-values: ['true', 'false', 'on']
+  comments:
+    min-spaces-from-content: 1
+  new-lines:
+    type: unix

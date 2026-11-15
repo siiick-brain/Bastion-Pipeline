@@ -1,0 +1,41 @@
+name: oidc-demo
+
+# Requests a real GitHub OIDC token with a custom audience and verifies it with
+# scripts/oidc/verifier.py against scripts/oidc/policy.toml (spec item 11).
+# No cloud account is involved. Run from main: the policy accepts. Run from any other ref:
+# the policy rejects and the job fails, which demonstrates the denial path.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/oidc/**
+      - .github/workflows/oidc-demo.yml
+
+permissions: {}
+
+jobs:
+  verify-token:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: oidc-demo
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --require-hashes --no-deps -r app/requirements-dev.txt
+      - name: Verify the real token against the policy
+        run: python -m scripts.oidc.verifier --policy scripts/oidc/policy.toml
+      - name: Negative check with the real token (wrong expected audience must be rejected)
+        run: |
+          if python -m scripts.oidc.verifier --policy scripts/oidc/policy.toml --audience sts.amazonaws.com; then
+            echo "::error::token accepted for the wrong audience"; exit 1
+          fi
+          echo "Wrong audience rejected as expected."

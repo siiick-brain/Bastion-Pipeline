@@ -1,14 +1,28 @@
 version: 2
+# A 7 day cooldown delays adoption of brand-new releases, which limits exposure to a
+# compromised upstream release. Security updates are not delayed by the cooldown.
 updates:
   - package-ecosystem: pip
-    directory: "/"
+    directories: ["/app", "/update-signing"]
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      python:
+        patterns: ["*"]
   - package-ecosystem: docker
-    directory: "/"
+    directories: ["/", "/update-signing", "/infra/jenkins"]
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]

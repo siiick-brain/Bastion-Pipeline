@@ -1,18 +1,7 @@
-# SCA tool gate plan
+# Software composition analysis tools
 
-This short guide records which tools gate pull requests and which tools run deeper scans.
+Pull request gate: OSV-Scanner on every lock file, plus dependency review on pull requests. Trivy gates the built image.
 
-## Pull request gates
+Scheduled deep scans (weekly, `.github/workflows/scheduled-scans.yml`): OWASP Dependency-Check, OSV-Scanner full source and image scan, ZAP full scan.
 
-- Semgrep
-- Gitleaks
-- Trivy filesystem and config checks
-- OSV-Scanner
-- Dependency review
-
-## Deep scan jobs
-
-- Dependency-Check weekly job
-- ZAP full scans on the demo app
-- Container image scanning on the release path
-- SonarCloud quality gate with explicit wait
+Each finding class has one blocking owner so findings are not duplicated. The full table with versions, inputs, outputs and external data flows is in [tool ownership](tool-ownership.md). The reasoning is in [ADR 0002](adr/0002-scanner-split.md).

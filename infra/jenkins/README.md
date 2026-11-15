@@ -1,10 +1,3 @@
 # Jenkins
 
-This folder contains the Jenkins configuration, pinned plugin list and the local compose setup.
-
-## Planned proof
-
-- Controller and agent in isolated compose services.
-- Configuration as Code for the controller.
-- Declarative Jenkinsfile with the same stage flow.
-- Local run with pinned images and plugins.
+Controller and isolated SSH agent with pinned images and plugins, Configuration as Code and no Docker socket. Start with `bash setup.sh`, run with `python run_job.py`. Details and evidence: [Jenkins](../../docs/jenkins.md).

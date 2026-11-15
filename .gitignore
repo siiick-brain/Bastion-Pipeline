@@ -48,3 +48,14 @@ logs/
 # Local secrets
 secrets/
 private/
+
+# Local scan and render output
+zap-out/
+zap-*.log
+rendered/
+coverage.json
+junit.xml
+evidence/
+
+# Jenkins local secrets
+infra/jenkins/secrets/

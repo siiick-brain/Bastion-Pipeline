@@ -1,0 +1,45 @@
+name: dast-demo
+
+# Manual only (spec item 7). Starts the pinned OWASP Juice Shop image inside an internal Docker
+# network on the runner, runs a ZAP baseline against it and uploads the report.
+# Juice Shop is never deployed anywhere and no external target is scanned.
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  juice-shop-baseline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Start Juice Shop on an internal network (no published ports)
+        run: |
+          docker network create --internal dast-demo
+          docker run -d --name juice --network dast-demo \
+            bkimminich/juice-shop@sha256:2765a26de7647609099a338d5b7f61085d95903c8703bb70f03fcc4b12f0818d
+          for _ in $(seq 1 60); do
+            if docker run --rm --network dast-demo curlimages/curl@sha256:935d9100e9ba842cdb060de42472c7ca90cfe9a7c96e4dacb55e79e560b3ff40 -sf http://juice:3000 >/dev/null; then break; fi
+            sleep 2
+          done
+      - name: ZAP baseline against Juice Shop
+        run: DAST_NETWORK=dast-demo bash scripts/zap-scan.sh baseline http://juice:3000 juice-shop || true
+      - name: Summarise alert counts
+        run: python3 scripts/zap_summary.py zap-out/juice-shop.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Clean up
+        if: always()
+        run: |
+          docker rm -f juice || true
+          docker network rm dast-demo || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: zap-juice-shop
+          path: zap-out
+          retention-days: 30

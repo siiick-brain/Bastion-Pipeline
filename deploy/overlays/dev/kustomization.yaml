@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+# scripts/promote.ps1 sets this digest after cosign verification. The all-zero digest means
+# no release has been promoted yet, so the pod cannot start until a verified image is promoted.
+images:
+  - name: bastion-notes
+    newName: ghcr.io/siiick-brain/bastion-pipeline
+    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000

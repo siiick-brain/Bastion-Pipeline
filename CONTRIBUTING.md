@@ -1,15 +1,15 @@
 # Contributing
 
-This project is a personal repository for the pipeline work. The main contribution flow is through clean branches, local checks and a pull request review.
+This is a personal repository. Changes go through a branch, the local checks and a pull request.
 
 ## Local checks
 
-1. Run pwsh -File scripts/check-style.ps1.
-2. Run the app and Windows checks relevant to the change.
-3. Ensure the JSON, YAML and shell files are valid before opening a pull request.
+1. `git config core.hooksPath scripts/hooks`
+2. `pwsh -File scripts/validate-pipeline.ps1`
 
 ## Commit rules
 
-- Use the repository author identity.
-- No Co-authored-by trailers.
-- No author email other than devasoka38@gmail.com.
+- Author and committer must match `.github/allowed-author`.
+- Conventional Commit titles, at most 72 characters.
+- No co-author or tool attribution trailers.
+- Never bypass hooks with `--no-verify`.
