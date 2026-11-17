@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Admission-time signature enforcement with Kyverno (`kind-up.ps1 -WithAdmission`, ADR 0006): pods in the `bastion` namespace must run the project image by digest with a release workflow signature. `scripts/verify-admission.ps1` checks it.
+
 ## 0.2.1 (2026-11-17)
 
 ### Added
