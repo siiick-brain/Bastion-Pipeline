@@ -104,4 +104,4 @@ kind cluster, local registry on `127.0.0.1:5001`, ArgoCD, Jenkins controller and
 
 ## Deployment boundary
 
-The only deployment target is the local kind cluster. There is no cloud account. ArgoCD reads `deploy/overlays/dev` from the GitHub repository. Signature verification happens before promotion (in `promote.ps1`), not at admission time. Admission-time enforcement is PLANNED (see [known limitations](known-limitations.md)).
+The only deployment target is the local kind cluster. There is no cloud account. ArgoCD reads `deploy/overlays/dev` from the GitHub repository. Signature verification happens before promotion (in `promote.ps1`). On a cluster set up with `kind-up.ps1 -WithAdmission`, Kyverno verifies it again at admission time ([ADR 0006](adr/0006-admission-signature-policy.md)).

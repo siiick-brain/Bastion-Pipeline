@@ -9,7 +9,6 @@
 
 ## Planned (deferred ideas)
 
-- Admission-time signature verification with a Sigstore policy controller.
 - Ephemeral Jenkins agents per build.
 - Reproducible build comparison between two independent builds.
 - Mutation testing for `scripts/oidc/verifier.py` and `update-signing/bastion_update/device.py`.

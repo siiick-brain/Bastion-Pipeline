@@ -29,7 +29,7 @@ Every tool has one job. "Gate" means a failure blocks a pull request or a releas
 | cosign | 3.1.4 | Keyless signing and verification | Digest, blobs | Signatures, attestations | Release | | | Sigstore Fulcio and Rekor (public log) | |
 | GitHub artifact attestations | attest-build-provenance 4.2.2 | SLSA v1 provenance | Digest, zip | Attestation | Release | | | GitHub, Sigstore | |
 | kind, kubectl, kustomize | 0.33.0, 1.36.1, 5.8.1 | Local cluster and rendering | Overlays | Running cluster | Deployment | | | | Local only |
-| ArgoCD | 3.6.1 | GitOps sync and self-heal | GitHub repository | Sync status | Deployment | | | github.com (pull) | No admission-time signature policy |
+| ArgoCD | 3.6.1 | GitOps sync and self-heal | GitHub repository | Sync status | Deployment | | | github.com (pull) | Admission-time signature policy by Kyverno (opt-in) |
 | SoftHSM2, python-pkcs11 | Debian 13 package, 0.10.1 | PKCS#11 signing | Manifest | Signature | Container job | | | | Software token, not an HSM |
 | Dependabot | GitHub | Update PRs with 7-day cooldown | Manifests | PRs | | Weekly | | GitHub | |
 

@@ -7,3 +7,4 @@
 | [0003](0003-gitops-promotion.md) | Promotion by verified digest in Git, applied by ArgoCD | Accepted |
 | [0004](0004-container-base-image.md) | Chainguard Python base image instead of distroless Debian 12 | Accepted |
 | [0005](0005-hash-locked-dependencies.md) | Hash-locked dependencies with uv, separate runtime and dev sets | Accepted |
+| [0006](0006-admission-signature-policy.md) | Admission-time signature enforcement with Kyverno | Accepted |

@@ -15,5 +15,5 @@ Deployment must use exactly the artifact that was signed and verified. Tags are 
 
 ## Consequences
 
-- Verification happens before promotion, not at admission. A user with cluster-admin can still apply an unsigned image directly. Admission-time verification is PLANNED.
+- Verification happens before promotion, not at admission. A user with cluster-admin can still apply an unsigned image directly. Admission-time verification was added later in [ADR 0006](0006-admission-signature-policy.md).
 - Rollback is a `git revert` of the promotion commit.

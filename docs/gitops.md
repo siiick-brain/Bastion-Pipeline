@@ -49,4 +49,4 @@ pwsh -File scripts/verify-deployment.ps1 -Overlay dev -Tag v0.2.0
 
 ## Limits
 
-Local cluster only. Signatures are verified before promotion, not by an admission controller, so cluster-admin can bypass the check. Admission-time verification is PLANNED.
+Local cluster only. Signatures are verified before promotion. With `kind-up.ps1 -WithAdmission`, Kyverno verifies them again at admission ([ADR 0006](adr/0006-admission-signature-policy.md)). Cluster-admin can still remove the policy.

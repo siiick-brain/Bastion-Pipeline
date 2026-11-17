@@ -16,7 +16,7 @@ The `ci`, `security`, `windows` and `oidc-demo` workflows passed on GitHub on 20
 
 | Area | Limit | Mitigation or plan |
 | --- | --- | --- |
-| Signature enforcement | Verified before promotion, not at admission. Cluster-admin can deploy an unsigned image. | Admission controller with a Sigstore policy (PLANNED) |
+| Signature enforcement | Verified before promotion. With `-WithAdmission`, Kyverno verifies again at admission. Cluster-admin can still remove the policy or Kyverno. | [ADR 0006](adr/0006-admission-signature-policy.md); a real cluster would also restrict who can change admission policies |
 | Sigstore | Public Rekor log reveals repository and digests. Depends on public Sigstore availability. | Accepted for a public repository |
 | SoftHSM | Software token, no hardware protection. The rollback counter is a file that an attacker with volume write access can reset. | Documented; a real HSM or TPM monotonic counter is required in production |
 | Firmware | Simulation only. No hardware root of trust. | Documented as a simulation |

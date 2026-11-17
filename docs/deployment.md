@@ -26,5 +26,5 @@ flowchart LR
 ## Limits
 
 - Local kind cluster only. No cloud account.
-- No admission-time signature enforcement (PLANNED).
+- Admission-time signature enforcement is opt-in (`kind-up.ps1 -WithAdmission`), see [ADR 0006](adr/0006-admission-signature-policy.md).
 - `localhost:5001` is a plain HTTP registry used only on the workstation.

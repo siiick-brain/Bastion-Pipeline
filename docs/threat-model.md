@@ -79,7 +79,7 @@ Last reviewed: 2026-11-15.
 | Boundary | TB4, TB5 |
 | Impact | Users run modified code |
 | Existing mitigation | Push and reference by digest. Keyless signatures on image and checksums. SBOMs attested to the digest. `sbom_check.py` binds SBOMs to the digest. Windows `Test-Checksum` rejects path traversal. |
-| Additional mitigation | Admission-time signature policy (PLANNED). |
+| Additional mitigation | Admission-time signature policy with Kyverno ([ADR 0006](adr/0006-admission-signature-policy.md)). |
 | Verification | `tests/integration/test_supply_chain.py::test_modified_blob_fails_signature` (PASS 2026-11-15). `windows/tests/build.tests.ps1` checksum tamper cases (PASS 2026-11-15). Hosted release `tamper_rejected`: NOT VERIFIED. |
 
 ## T7. Signing credential compromise
@@ -118,8 +118,8 @@ Last reviewed: 2026-11-15.
 | Boundary | TB5, TB6 |
 | Impact | Unsigned or privileged workload runs |
 | Existing mitigation | `promote.ps1` refuses tags and unverified digests. Namespace enforces Pod Security `restricted`. Default-deny NetworkPolicy. ClusterIP service only. ArgoCD self-heal reverts manual changes. |
-| Additional mitigation | Admission-time signature verification with a policy controller (PLANNED). |
-| Verification | `scripts/kind-demo.ps1` on 2026-11-15: unsigned image refused by `promote.ps1` (PASS). `scripts/verify-deployment.ps1`: privileged pod rejected by admission (PASS). ArgoCD drift heal: NOT VERIFIED. |
+| Additional mitigation | Admission-time signature verification with Kyverno ([ADR 0006](adr/0006-admission-signature-policy.md)): only the project image by digest, signed by the release workflow. |
+| Verification | `scripts/kind-demo.ps1` on 2026-11-15: unsigned image refused by `promote.ps1` (PASS). `scripts/verify-deployment.ps1`: privileged pod rejected by admission (PASS). ArgoCD drift heal: PASS on 2026-11-17. `scripts/verify-admission.ps1` on 2026-11-17: signed releases admitted, tag reference, foreign registry and unsigned object rejected (PASS). |
 
 ## T10. Software update rollback
 
