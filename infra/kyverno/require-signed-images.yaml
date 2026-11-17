@@ -1,0 +1,65 @@
+# Admission-time enforcement for the bastion namespace (opt-in: scripts/kind-up.ps1 -WithAdmission).
+# Policy 1 rejects any container image that is not the project image referenced by digest.
+# Policy 2 rejects any project image without a keyless signature from the release workflow on a
+# version tag (the same identity that docs/verify.md and scripts/promote.ps1 check).
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: bastion-project-image-by-digest
+spec:
+  validationActions: [Deny]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [pods]
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: bastion
+  validations:
+    - expression: >-
+        object.spec.containers.all(c, c.image.startsWith('ghcr.io/siiick-brain/bastion-pipeline@sha256:')) &&
+        (!has(object.spec.initContainers) ||
+          object.spec.initContainers.all(c, c.image.startsWith('ghcr.io/siiick-brain/bastion-pipeline@sha256:'))) &&
+        (!has(object.spec.ephemeralContainers) ||
+          object.spec.ephemeralContainers.all(c, c.image.startsWith('ghcr.io/siiick-brain/bastion-pipeline@sha256:')))
+      message: Only ghcr.io/siiick-brain/bastion-pipeline referenced by digest may run in the bastion namespace.
+---
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: bastion-release-signature
+spec:
+  validationActions: [Deny]
+  failurePolicy: Fail
+  webhookConfiguration:
+    timeoutSeconds: 30
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [pods]
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: bastion
+  matchImageReferences:
+    - glob: "ghcr.io/siiick-brain/bastion-pipeline*"
+  validationConfigurations:
+    required: true
+    verifyDigest: true
+    mutateDigest: false
+  attestors:
+    - name: release
+      cosign:
+        keyless:
+          identities:
+            - issuer: https://token.actions.githubusercontent.com
+              subjectRegExp: '^https://github\.com/siiick-brain/Bastion-Pipeline/\.github/workflows/release\.yml@refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$'
+        ctlog:
+          url: https://rekor.sigstore.dev
+  validations:
+    - expression: >-
+        images.containers.map(image, verifyImageSignatures(image, [attestors.release])).all(e, e > 0)
+      message: The image is not signed by the Bastion release workflow on a version tag.
