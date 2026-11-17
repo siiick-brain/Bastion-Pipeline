@@ -2,7 +2,16 @@
 
 A secure software delivery pipeline you can clone, run and break on purpose. The payload is small (a FastAPI notes service and a Windows package). The pipeline is the product: hash-locked builds, a hardened container, scanning gates, SBOMs, keyless signing, provenance verification, a release gate, GitOps deployment and signed updates.
 
-The goal is evidence. Every claim below names a command, a date and a result. Status words follow [the glossary](docs/GLOSSARY.md): PASS, FAIL, NOT VERIFIED, PLANNED, NOT APPLICABLE.
+The goal is evidence. Every claim below names a command or a run and a result. Status words follow [the glossary](docs/GLOSSARY.md): PASS, FAIL, NOT VERIFIED, PLANNED, NOT APPLICABLE.
+
+## At a glance
+
+- Two signed releases, [v0.2.0](https://github.com/siiick-brain/Bastion-Pipeline/releases/tag/v0.2.0) and [v0.2.1](https://github.com/siiick-brain/Bastion-Pipeline/releases/tag/v0.2.1), each verified again outside CI with [the verify guide](docs/verify.md).
+- Every change reaches `main` through a pull request that must pass 9 required checks. Five open [gate demo](docs/gate-demos.md) pull requests show each gate blocking a bad change.
+- ArgoCD deployed `v0.2.1` and a `git revert` pull request rolled it back to `v0.2.0` ([GitOps](docs/gitops.md)).
+- Every requirement maps to a test and evidence in the [control matrix](docs/control-matrix.md).
+
+![Release v0.2.0: every job green, the job graph and the production approval](docs/images/release-job-graph.png)
 
 ## What it demonstrates
 
@@ -53,20 +62,21 @@ Which tool owns which finding: [tool ownership](docs/tool-ownership.md).
 
 ## Results from real runs
 
-Local runs on 2026-11-15 (Windows 11, Docker Desktop 29.9). Hosted runs have not happened since these changes, so they are NOT VERIFIED.
+Hosted runs on GitHub on 2026-11-16 and 2026-11-17, local runs on Windows 11 with Docker Desktop 29.9.
 
-| Check | Command | Result |
+| Check | Where | Result |
 | --- | --- | --- |
-| Python tests and coverage | `pytest --cov` | PASS: 237 tests, 93.76 percent |
-| Pester (Windows build and style) | `Invoke-Pester windows/tests tests/style` | PASS: 37 tests |
-| Container runtime checks | `pytest tests/integration -m integration` | PASS: 11 tests |
-| Real Sigstore identity checks | `pytest tests/integration -m network` | PASS: 7 tests |
+| Pull request gates (ci, security, windows) | GitHub, every pull request | PASS: 14 checks, 9 of them required |
+| Python tests and coverage | `pytest --cov` in the release | PASS: 264 tests, 94.22 percent |
+| SonarCloud quality gate | GitHub `security` workflow | PASS: security, reliability and maintainability A, 0 vulnerabilities |
+| Release `v0.2.1` | GitHub release run 44092986387 | PASS: signed by digest, SBOMs, provenance, gate ALLOWED after the `production` approval |
+| Independent release verification | [verify guide](docs/verify.md), run outside CI | PASS: signature, attestations, provenance policy; tampered checksums and a wrong signer rejected |
+| Real OIDC token policy | GitHub `oidc-demo` runs 43815627785 and 44045166737 | PASS: accepted on `main`, rejected for the wrong audience and for another branch |
+| Deployment, drift and rollback | kind with ArgoCD | PASS: 8 checks, drift healed, rollback by revert ([report](docs/deployment-verification.md)) |
 | Image vulnerabilities, naive versus hardened | `trivy image` 0.76.2 | 15 critical and 491 high versus 0 and 0 ([hardening](docs/hardening.md)) |
-| Image size, naive versus hardened | `docker image inspect` | 1.88 GB versus 122 MB |
 | Signed update suite in SoftHSM container | `update-signing/run-demo.sh` | PASS: 55 tests, counter persists across runs |
 | Jenkins pipeline, isolated agent | `infra/jenkins/run_job.py` | PASS: build 9 |
-| Deployment on kind | `scripts/kind-demo.ps1` | PASS: 6 checks, 3 NOT VERIFIED ([report](docs/deployment-verification.md)) |
-| Hosted GitHub workflows, release, OIDC demo, GitLab | | NOT VERIFIED |
+| GitLab CI run, pull request from a fork | | NOT VERIFIED ([known limitations](docs/known-limitations.md)) |
 
 ## Quick start
 
@@ -75,7 +85,7 @@ git clone https://github.com/siiick-brain/Bastion-Pipeline.git
 cd Bastion-Pipeline
 git config core.hooksPath scripts/hooks
 python -m venv .venv
-.venv/Scripts/python -m pip install --require-hashes --no-deps -r app/requirements-dev.txt
+.venv/Scripts/python -m pip install --require-hashes --no-deps --only-binary :all: -r app/requirements-dev.txt
 pwsh -File scripts/validate-pipeline.ps1
 ```
 
@@ -89,7 +99,7 @@ Prerequisites and every other command: [operations](docs/operations.md).
 | `pytest tests/integration/test_supply_chain.py -m network -v` | Wrong workflow, ref, issuer and repository rejected by cosign against real Sigstore data |
 | `pwsh -File scripts/kind-demo.ps1` | An unsigned image is refused before deployment |
 | Two runs of the SoftHSM container | A downgrade is refused after a container restart |
-| `pwsh -File scripts/make-gate-demos.ps1`, push a branch, open a PR | A secret, a vulnerable dependency, a failing test, an unpinned action or a root container turns a check red |
+| `pwsh -File scripts/make-gate-demos.ps1`, push a branch, open a PR | A secret, a vulnerable dependency, a failing test, an unpinned action or a root container turns a check red (see the open pull requests 18 to 22) |
 
 ## Verify a release
 
