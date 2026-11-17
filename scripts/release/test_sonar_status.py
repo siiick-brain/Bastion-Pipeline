@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 from pathlib import Path
 from typing import Any
 
@@ -67,3 +68,51 @@ def test_main_writes_nothing_on_an_unexpected_reply(
     out = tmp_path / "sonarcloud.txt"
     assert sonar_status.main(["--revision", SHA, "--out", str(out)]) == 0
     assert not out.exists()
+
+
+def test_main_writes_pass_for_an_analysed_commit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fetch = _fetcher([{"key": "AN1", "revision": SHA}], {"status": "OK", "conditions": []})
+    monkeypatch.setattr(sonar_status, "https_json", fetch)
+    out = tmp_path / "sonarcloud.txt"
+    assert sonar_status.main(["--revision", SHA, "--out", str(out)]) == 0
+    assert out.read_text(encoding="utf-8") == "PASS\n"
+
+
+def test_main_writes_nothing_when_the_commit_has_no_analysis(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sonar_status, "https_json", _fetcher([]))
+    out = tmp_path / "sonarcloud.txt"
+    assert sonar_status.main(["--revision", SHA, "--out", str(out)]) == 0
+    assert not out.exists()
+
+
+def test_project_key_missing_is_an_error(tmp_path: Path) -> None:
+    props = tmp_path / "sonar-project.properties"
+    props.write_text("sonar.organization=o\n")
+    with pytest.raises(ValueError, match="projectKey"):
+        sonar_status.project_key(props)
+
+
+def test_https_json_refuses_plain_http() -> None:
+    with pytest.raises(ValueError, match="HTTPS"):
+        sonar_status.https_json("http://sonarcloud.io/api")
+
+
+def test_https_json_reads_json(monkeypatch: pytest.MonkeyPatch) -> None:
+    class Reply(io.BytesIO):
+        def __enter__(self) -> Reply:
+            return self
+
+        def __exit__(self, *exc: object) -> None:
+            self.close()
+
+    def fake_urlopen(url: str, timeout: int) -> Reply:
+        assert url.startswith("https://")
+        assert timeout == 30
+        return Reply(b'{"ok": true}')
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    assert sonar_status.https_json("https://sonarcloud.io/api") == {"ok": True}
