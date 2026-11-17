@@ -7,4 +7,4 @@ resources:
 images:
   - name: bastion-notes
     newName: ghcr.io/siiick-brain/bastion-pipeline
-    digest: sha256:706f6b48b24903b5b8e97bcc70e3619a682acd41ab0fb9667a2be9ac52ec3c00
+    digest: sha256:dbba11b288a6a0b8d0a556b89fa331a21fdd312ef2d5f77212859a058a6c7916
