@@ -1,6 +1,27 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 (2026-11-17)
+
+### Added
+
+- The release gate records the SonarCloud quality gate of the released commit (`scripts/release/sonar_status.py`). The control is advisory and never blocks a release.
+- Pester tests for `promote.ps1`.
+
+### Fixed
+
+- Gitleaks scanned every branch, so a pushed `gate-demo/fake-secret` branch would have failed the secrets gate on `main`. It now scans the history reachable from the checked-out commit.
+- `promote.ps1` dropped the final newline of the overlay file, so every promotion failed yamllint. It also suggested a commit title the commit policy rejects.
+- `promote.ps1` and `verify-deployment.ps1` find cosign under its winget name.
+- The unpinned-action gate demo failed on yamllint before zizmor could run.
+- The authorship check rejected the committer identity that GitHub records for web merges.
+
+### Changed
+
+- Chainguard Python base image digests updated.
+
+## 0.2.0 (2026-11-16)
+
+First signed release: image `sha256:706f6b48...` with SBOMs, provenance and a gated `production` approval.
 
 ### Fixed
 
