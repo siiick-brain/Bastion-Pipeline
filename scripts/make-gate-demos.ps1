@@ -53,7 +53,7 @@ $demos = [ordered]@{
     }
     'gate-demo/unpinned-action' = @{
         Gate = 'zizmor'; Message = 'ci(gate-demo): reference a third-party action by tag'
-        Change = { Set-Content -LiteralPath (Join-Path $RepoRoot '.github/workflows/gate-demo.yml') -Value "name: gate-demo`non: workflow_dispatch`npermissions: {}`njobs:`n  demo:`n    runs-on: ubuntu-24.04`n    steps:`n      - uses: aquasecurity/trivy-action@master`n" }
+        Change = { Set-Content -LiteralPath (Join-Path $RepoRoot '.github/workflows/gate-demo.yml') -Value "name: gate-demo`non: workflow_dispatch`npermissions: {}`njobs:`n  demo:`n    runs-on: ubuntu-24.04`n    steps:`n      - uses: aquasecurity/trivy-action@master" }
     }
     'gate-demo/root-container' = @{
         Gate = 'Trivy config'; Message = 'build(gate-demo): run the container as root'
