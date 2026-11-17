@@ -2,12 +2,11 @@
 
 ## Next (needs the owner)
 
-1. Apply the branch ruleset (`scripts/apply-branch-protection.ps1`).
-2. Close Dependabot pull request 16 if it does not close itself (`main` already has its change).
-3. Promote the released digest and verify ArgoCD sync, drift healing and rollback.
-4. Push the gate demo branches and record the red checks.
-5. Optional: add `NVD_API_KEY` and a GitLab remote.
-6. Capture the screenshots in [the screenshot plan](screenshots.md).
+1. Release `v0.2.1`, promote it through a pull request, then revert that pull request to verify rollback to `v0.2.0`.
+2. Apply Dependabot base image updates (pull request 16) through a pull request under the owner identity.
+3. Run the DAST demo workflow and wait for the first scheduled scans.
+4. Optional: add `NVD_API_KEY` and a GitLab remote.
+5. Capture the remaining screenshots in [the screenshot plan](screenshots.md).
 
 ## Planned (deferred ideas)
 

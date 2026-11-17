@@ -68,7 +68,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | C54 | Tampered artifact fails | `verify-release.sh` negative controls | `test_modified_blob_fails_signature` | | PASS (local) |
 | C55 | Release gate blocks on FAIL or NOT VERIFIED | `gate.py` | `test_gate.py` (26) | | PASS |
 | C56 | Required reviewer on production | environment `production` | manual | GitHub release run 43983071969: gate waited until the owner approved | PASS |
-| C57 | Branch ruleset with dry run, confirmation, verification | `apply-branch-protection.ps1` | dry run against the real repository | | PASS (dry run), NOT VERIFIED (apply) |
+| C57 | Branch ruleset with dry run, confirmation, verification | `apply-branch-protection.ps1` | dry run, then `-Apply` against the real repository | 2026-11-17: ruleset 27441845 `main-protection` active on `refs/heads/main` (deletion, non fast forward, linear history, pull request, 9 required checks) | PASS |
 
 ## OIDC
 
@@ -76,7 +76,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | --- | --- | --- | --- | --- | --- |
 | C60 | Algorithm allowlist, JWKS by kid, rotation, claims, policy, masking | `scripts/oidc/verifier.py` | `scripts/oidc/test_verifier.py` (44) | | PASS |
 | C61 | Real JWKS reachable and validated | same | `test_oidc_live.py` | | PASS |
-| C62 | Real token accepted on main, denied elsewhere | `oidc-demo.yml` | hosted | GitHub `oidc-demo` run 43815627785: ACCEPTED on main, wrong audience REJECTED | PASS (main, audience), NOT VERIFIED (other ref) |
+| C62 | Real token accepted on main, denied elsewhere | `oidc-demo.yml` | hosted | GitHub `oidc-demo` runs 43815627785 (ACCEPTED on main, wrong audience REJECTED) and 44045166737 (REJECTED: ref `refs/heads/gate-demo/failing-test` not allowed by policy) | PASS |
 
 ## Deployment
 
@@ -86,7 +86,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | C71 | Running digest equals signed digest | `verify-deployment.ps1` | kind | same | PASS |
 | C72 | Effective pod security context | same | kind | same | PASS |
 | C73 | Admission rejects privileged pods | Pod Security `restricted` | kind dry run | same | PASS |
-| C74 | ArgoCD Synced, Healthy, drift healed, rollback | `infra/argocd` | hosted plus kind | | NOT VERIFIED |
+| C74 | ArgoCD Synced, Healthy, drift healed, rollback | `infra/argocd` | `verify-deployment.ps1` on kind | 2026-11-17: Synced and Healthy at commit `87fb5bc` from GitHub, scaled to 3 and restored to 1 (see [deployment verification](deployment-verification.md)) | PASS (sync, drift), NOT VERIFIED (rollback needs a second release) |
 | C75 | No public exposure | ClusterIP, 127.0.0.1 binds, NetworkPolicy | manifest review | | PASS (static) |
 
 ## Jenkins and GitLab
