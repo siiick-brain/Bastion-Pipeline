@@ -4,7 +4,7 @@ Date: 2026-11-17. Status: Accepted. Extends [ADR 0003](0003-gitops-promotion.md)
 
 ## Context
 
-`promote.ps1` verifies the release signature before a digest is committed to an overlay, and ArgoCD deploys only what Git holds. Nothing stopped a user with cluster access from applying an unsigned image to the `bastion` namespace directly.
+`promote.ps1` verifies the release signature before a digest is committed to an overlay. ArgoCD deploys only what Git holds. Nothing stopped a user with cluster access from applying an unsigned image to the `bastion` namespace directly.
 
 ## Decision
 
