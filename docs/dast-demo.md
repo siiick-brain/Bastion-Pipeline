@@ -29,4 +29,4 @@ Workflow: `.github/workflows/dast-demo.yml` (`workflow_dispatch` only). The same
 | Low | 2 | 10017 Cross-Domain JavaScript Source File Inclusion, 10096 Timestamp Disclosure |
 | Informational | 1 | 10109 Modern Web Application |
 
-56 rules passed. A baseline scan is passive, so it finds header and library issues, not the injection flaws Juice Shop also contains. Hosted workflow run: NOT VERIFIED.
+56 rules passed. A baseline scan is passive, so it finds header and library issues, not the injection flaws Juice Shop also contains. Hosted workflow run: PASS, GitHub `dast-demo` run 44091481318 on 2026-11-17 reported the same six alert types (1 high, 2 medium, 2 low, 1 informational).

@@ -31,7 +31,7 @@ pwsh -File scripts/verify-deployment.ps1 -Overlay dev -Tag v0.2.0
 ## Drift and rollback
 
 - Drift: `verify-deployment.ps1` scales the deployment to 3 replicas and waits for ArgoCD self-heal to restore the committed count.
-- Rollback: `git revert <promotion commit>` and push. ArgoCD syncs the previous digest.
+- Rollback: `git revert <promotion commit>` on a branch and merge it through a pull request (the `main` ruleset blocks direct pushes). ArgoCD syncs the previous digest.
 
 ## Status
 
@@ -44,7 +44,8 @@ pwsh -File scripts/verify-deployment.ps1 -Overlay dev -Tag v0.2.0
 | Promoted overlay applied to kind: image pulled anonymously from GHCR, Pod Security `restricted`, `/health` and `POST /notes` answer | 2026-11-17 | PASS |
 | ArgoCD Synced and Healthy for `bastion-dev`, deploying commit `87fb5bc` from GitHub | 2026-11-17 | PASS |
 | Drift healed: scaled to 3 replicas, ArgoCD restored 1 | 2026-11-17 | PASS |
-| Rollback by `git revert` | | NOT VERIFIED: needs a second release to roll back from |
+| Release `v0.2.1` promoted by pull request 26; ArgoCD ran `sha256:dbba11b2...` and `/health` answered | 2026-11-17 | PASS |
+| Rollback by `git revert`: pull request 27 reverted the promotion; ArgoCD returned to `v0.2.0` (`sha256:706f6b48...`) | 2026-11-17 | PASS |
 
 ## Limits
 
