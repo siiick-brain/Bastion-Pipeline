@@ -21,7 +21,7 @@ Every tool has one job. "Gate" means a failure blocks a pull request or a releas
 | OSV-Scanner | 2.2.4 | Known vulnerabilities in lock files | Lock files | Findings | PR | Weekly full scan | Dependency-Check, Trivy | osv.dev (package names) | Exceptions only through `osv-scanner.toml` plus the register |
 | dependency-review-action | 5.0.0 | New vulnerable or GPL dependencies in a PR | PR diff | Findings | PR | | OSV-Scanner | GitHub | PRs only |
 | Trivy | 0.76.2 | Image vulnerabilities, IaC misconfiguration | Image, repo | Table, JSON | PR, release | | OSV, hadolint | Vulnerability DB download | Ignore file entries expire |
-| OWASP Dependency-Check | image digest pinned | Deep CVE scan | `app/` | HTML, JSON | No (scheduled) | Weekly | OSV-Scanner | NVD | Slow, needs NVD key for rate limits |
+| OWASP Dependency-Check | image digest pinned | Deep CVE scan | `app/` | HTML, JSON | No (scheduled) | Weekly | OSV-Scanner | NVD | Needs the `NVD_API_KEY` secret; without it the job skips and reports NOT VERIFIED |
 | ZAP | stable, digest pinned | DAST | Local container only | HTML, JSON | PR (baseline) | Weekly (full) | | | `scripts/zap-scan.sh` refuses non-local targets |
 | Syft | 1.55.0 | SBOMs | Image digest | CycloneDX 1.6, SPDX 2.3 | Release | | | Registry pull | |
 | cyclonedx-cli | 0.29.1 | CycloneDX schema validation | SBOM | Pass or fail | Release | | | | Supports up to CycloneDX 1.6 |

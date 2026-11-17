@@ -10,7 +10,7 @@ This project demonstrates secure delivery practices. It is not production ready 
 
 ## Not verified until hosted runs happen
 
-The `ci`, `security`, `windows` and `oidc-demo` workflows passed on GitHub on 2026-11-16 (commit `bdfb847`). Release `v0.2.0` passed on 2026-11-16 (GitHub release run 43983071969): keyless signing, SBOM and provenance attestations, the release gate and the `production` approval. On 2026-11-17 the OIDC denial from a non-main ref, ArgoCD sync and drift healing from GitHub, the branch ruleset and the five gate demo pull requests passed as well. Release `v0.2.1`, its promotion, the rollback to `v0.2.0` and the hosted DAST demo passed later the same day. Still NOT VERIFIED: the scheduled scans (first weekly run pending), GitLab CI (needs a GitLab remote) and a pull request from a fork.
+The `ci`, `security`, `windows` and `oidc-demo` workflows passed on GitHub on 2026-11-16 (commit `bdfb847`). Release `v0.2.0` passed on 2026-11-16 (GitHub release run 43983071969): keyless signing, SBOM and provenance attestations, the release gate and the `production` approval. On 2026-11-17 the OIDC denial from a non-main ref, ArgoCD sync and drift healing from GitHub, the branch ruleset and the five gate demo pull requests passed as well. Release `v0.2.1`, its promotion, the rollback to `v0.2.0` and the hosted DAST demo passed later the same day. The scheduled scans ran on 2026-11-17 (run 44148583397): the full OSV scan and the ZAP full scan passed. Still NOT VERIFIED: OWASP Dependency-Check (needs the `NVD_API_KEY` secret), GitLab CI (needs a GitLab remote) and a pull request from a fork.
 
 ## Security limits
 
