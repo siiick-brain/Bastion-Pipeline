@@ -19,7 +19,8 @@ param(
     [string]$Tag,
     [string]$Repository = 'siiick-brain/Bastion-Pipeline',
     [string]$PublicKey,
-    [string]$Cosign = 'cosign',
+    # winget installs cosign under its release asset name.
+    [string]$Cosign = $(if (Get-Command cosign -ErrorAction SilentlyContinue) { 'cosign' } else { 'cosign-windows-amd64' }),
     [switch]$AllowHttpRegistry,
     [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
