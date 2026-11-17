@@ -1,3 +1,5 @@
-# One identity per line. The first line is current; later lines keep older commits valid.
+# One identity per line, all for the same GitHub account. The first line is the identity for new commits.
+# Later lines: the earlier address of existing commits and the display name GitHub records as committer of web merges.
 siiick-brain <187153867+siiick-brain@users.noreply.github.com>
 siiick-brain <devasoka38@gmail.com>
+Black Rose <187153867+siiick-brain@users.noreply.github.com>
