@@ -44,6 +44,10 @@ lint:
 test:
   stage: test
   extends: .python
+  # The commit policy tests create a throwaway Git repository; the slim image has no git.
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git > /dev/null
+    - 'python -m pip install --require-hashes --no-deps --only-binary :all: -r app/requirements-dev.txt'
   script:
     - python -m pytest --cov --cov-report=term --cov-report=xml:coverage.xml --cov-fail-under=85 --junitxml=junit.xml
   coverage: '/TOTAL.*\s(\d+(?:\.\d+)?)%/'
