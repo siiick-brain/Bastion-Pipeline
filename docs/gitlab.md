@@ -5,9 +5,8 @@
 ## Second remote
 
 ```bash
-git remote add gitlab git@gitlab.com:<user>/bastion-pipeline.git
+git remote add gitlab https://gitlab.com/siiick-brain/bastion-pipeline.git
 git push gitlab main
-glab ci lint            # needs: glab auth login
 ```
 
 ## Evidence
@@ -16,5 +15,4 @@ glab ci lint            # needs: glab auth login
 | --- | --- | --- | --- |
 | YAML lint | `yamllint --strict .gitlab-ci.yml` | 2026-11-15 | PASS |
 | GitLab CI JSON schema | `uvx check-jsonschema==0.36.0 --builtin-schema vendor.gitlab-ci .gitlab-ci.yml` | 2026-11-15 | PASS |
-| `glab ci lint` | | | NOT VERIFIED: glab not authenticated |
-| Pipeline run on GitLab | | | NOT VERIFIED: no GitLab remote configured |
+| Pipeline run on GitLab | pipeline 3083481172 on `gitlab.com/siiick-brain/bastion-pipeline` | 2026-11-18 | PASS: policy, lint, test, Semgrep, Gitleaks, OSV-Scanner, Trivy config and SBOM |

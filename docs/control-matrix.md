@@ -96,7 +96,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | --- | --- | --- | --- | --- | --- |
 | C80 | Jenkins runs the contract source stages | `Jenkinsfile`, `infra/jenkins` | build 9 | [Jenkins](jenkins.md) | PASS |
 | C81 | No Docker socket, isolated agent, secrets masked, host key pinned | `compose.yaml`, `casc.yaml` | `docker inspect`, `docker exec` | [Jenkins](jenkins.md) | PASS |
-| C82 | GitLab CI valid | `.gitlab-ci.yml` | JSON schema | | PASS (schema), NOT VERIFIED (run) |
+| C82 | GitLab CI valid and running | `.gitlab-ci.yml` | JSON schema, hosted run | GitLab pipeline 3083481172: 8 of 8 jobs | PASS |
 
 ## Signed updates and firmware
 
