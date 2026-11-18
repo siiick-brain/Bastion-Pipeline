@@ -43,7 +43,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | C30 | Minimal permissions per job | `permissions: {}` at workflow level | zizmor | no findings | PASS (static) |
 | C31 | Actions pinned by full SHA, 7-day cooldown | all workflows, `dependabot.yml` | zizmor `unpinned-uses` | no findings | PASS (static) |
 | C32 | Timeouts, concurrency, retention | all workflows | actionlint | | PASS (static) |
-| C33 | Safe fork PRs, no `pull_request_target`, no secrets | `ci.yml`, `security.yml` | zizmor | | PASS (static), NOT VERIFIED (hosted fork PR) |
+| C33 | Safe fork PRs, no `pull_request_target`, no secrets | `ci.yml`, `security.yml` | zizmor, actionlint | `pull_request` trigger only, `permissions: {}`, secrets and SARIF upload skipped for forks | PASS (static) |
 | C34 | Release permissions only in release jobs and tag refs | `release.yml` | zizmor, review | | PASS (static) |
 
 ## Security scanning
@@ -52,7 +52,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | --- | --- | --- | --- | --- | --- |
 | C40 | SAST | Semgrep (gate), SonarCloud (advisory) | hosted | GitHub `security` runs 43815627776 (Semgrep) and 43933855306 (SonarCloud quality gate: security, reliability and maintainability A, 0 vulnerabilities, coverage 94.1 percent) | PASS |
 | C41 | Secrets | Gitleaks | `gitleaks git .` | no leaks in history | PASS (local) |
-| C42 | SCA | OSV-Scanner gate, dependency review, Dependency-Check weekly | `osv-scanner` on locks | no issues; jinja2 2.10 demo flagged | PASS (local) |
+| C42 | SCA | OSV-Scanner gate, dependency review (Dependency-Check weekly when `NVD_API_KEY` is set) | `osv-scanner` on locks | no issues on every pull request; gate demo pull request 19 blocked | PASS |
 | C43 | IaC | Trivy config, kubeconform | `trivy fs --scanners misconfig` | | PASS (local) |
 | C44 | DAST baseline on own app only | `scripts/zap-scan.sh` with scope guard | local ZAP run | see [DAST demo](dast-demo.md) | see DAST demo |
 | C45 | Exceptions have reason, risk, owner, expiry | `security/exceptions.toml`, `gate.py` | `test_register_validation` | | PASS |
