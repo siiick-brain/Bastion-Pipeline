@@ -36,7 +36,7 @@ flowchart LR
     ghcr[(GHCR image by digest)]
     sig[(Sigstore Fulcio and Rekor)]
   end
-  subgraph local[Owner workstation]
+  subgraph local[Developer workstation]
     git[Git commit of overlay digest]
     kind[kind cluster and ArgoCD]
     jenk[Jenkins controller and agent]

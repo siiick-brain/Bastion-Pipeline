@@ -152,7 +152,7 @@ class Device:
         v = parse_version(manifest.version)
         if v < parse_version(state.rollback_floor):
             raise UpdateRejected(f"downgrade below rollback floor {state.rollback_floor} refused")
-        # Same version is allowed only to finish an activation that was interrupted.
+        # Same version: only to finish an interrupted activation.
         if v == parse_version(state.installed_version) and self.current() == manifest.version:
             raise UpdateRejected(f"version {manifest.version} is already installed")
         if v < parse_version(state.installed_version):
@@ -168,7 +168,7 @@ class Device:
             staging.mkdir(parents=True)
             for name in (PAYLOAD, MANIFEST, SIGNATURE):
                 shutil.copy2(package / name, staging / name)
-            # Time-of-check to time-of-use: verify the copy we are about to install.
+            # Re-verify the staged copy (TOCTOU).
             if self.verify(staging, now) != manifest:
                 raise UpdateRejected("package changed during installation")
             target = self.root / "versions" / manifest.version
@@ -176,8 +176,7 @@ class Device:
                 shutil.rmtree(target)
             target.parent.mkdir(parents=True, exist_ok=True)
             os.replace(staging, target)
-            # Advance the anti-rollback state before activating, so a crash in between can
-            # never leave the new version running with a counter that still allows older ones.
+            # State before current: a crash in between must not leave a rollback window.
             old = self.state()
             floor = max(parse_version(old.rollback_floor), parse_version(manifest.min_version))
             new_state = {

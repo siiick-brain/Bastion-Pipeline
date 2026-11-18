@@ -1,6 +1,6 @@
-# Skills evidence
+# Evidence report
 
-Date: 2026-11-17. Command: `pwsh -File scripts/verify-skills.ps1`.
+Date: 2026-11-18. Command: `pwsh -File scripts/collect-evidence.ps1`.
 
 Summary: NOT VERIFIED: 4, PASS: 16.
 
@@ -10,7 +10,7 @@ Summary: NOT VERIFIED: 4, PASS: 16.
 | 2 | GitLab CI file validates (schema) | PASS | `check-jsonschema vendor.gitlab-ci`: ok -- validation done |
 | 3 | Jenkinsfile runs locally | PASS | local Jenkins build 9: SUCCESS |
 | 4 | PowerShell and batch jobs pass Pester, exit codes propagate | PASS | Invoke-Pester: passed 39 failed 0 |
-| 5 | Linting and tests with coverage gate | PASS | `ruff; pytest --cov-fail-under=85`: Required test coverage of 85% reached. Total coverage: 92.62% |
+| 5 | Linting and tests with coverage gate | PASS | `ruff; pytest --cov-fail-under=85`: Required test coverage of 85% reached. Total coverage: 93.91% |
 | 6 | SAST: Semgrep and SonarCloud | NOT VERIFIED | Hosted only: both PASS in security.yml (control matrix C40); this local script does not query GitHub |
 | 7 | SCA: Dependabot config, OSV and Dependency-Check | NOT VERIFIED | dependabot.yml present: True; OSV: No issues found; Dependency-Check is scheduled (hosted run pending) |
 | 8 | DAST: ZAP baseline and Juice Shop demo | PASS | local runs: app baseline 0 warnings (docs/dast-demo.md); Juice Shop 6 alert types |
@@ -19,10 +19,10 @@ Summary: NOT VERIFIED: 4, PASS: 16.
 | 11 | SBOMs valid in both formats | NOT VERIFIED | Hosted only: v0.2.0 release SBOMs PASS schema and digest binding (docs/verify.md); this local script does not query GitHub |
 | 12 | Hardened image runs non-root | PASS | `pytest tests/integration -m integration`: ...........                                                              [100%] |
 | 13 | OIDC verifier accepts valid and rejects bad tokens | PASS | `pytest scripts/oidc`: ............................................                             [100%] |
-| 14 | ArgoCD Synced and Healthy, drift healed | NOT VERIFIED | Application bastion-dev not present (apply infra/argocd/application.yaml after the promotion commit is pushed) |
+| 14 | ArgoCD Synced and Healthy, drift healed | NOT VERIFIED | Application: Synced/Healthy; drift: run verify-deployment.ps1 |
 | 15 | Release gates block a failing condition | PASS | `pytest scripts/release/test_gate.py`: ................................                                         [100%] |
 | 16 | cosign verify passes and a tampered artifact fails | PASS | `pytest tests/integration/test_supply_chain.py -m network`: ......                                                                   [100%] |
-| 17 | SoftHSM signing, verification and negative cases | PASS | `docker run bastion-update-signing:local`: 55 passed, 1 skipped in 4.41s |
+| 17 | SoftHSM signing, verification and negative cases | PASS | `docker run bastion-update-signing:local`: 55 passed, 1 skipped in 2.24s |
 | 18 | Firmware simulation accepts one image and rejects five | PASS | `pytest firmware-sim`: ....................                                                     [100%] |
 | 19 | Hygiene: authors, trailers, tooling files, gitleaks, style | PASS | authorship since baseline, gitleaks history, style: Style check passed. |
 | 20 | Images present and linked | PASS | 3 images in docs/images (capture plan in docs/screenshots.md) |

@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# SoftHSM2 signing environment for update packages. SoftHSM is a software token: it
-# demonstrates the PKCS#11 interface, not hardware key protection (docs/pkcs11-softhsm.md).
+# SoftHSM2 signing environment (software token, see docs/pkcs11-softhsm.md).
 FROM debian:trixie-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
 # Package versions follow the pinned base image digest; Dependabot bumps the digest.
 # hadolint ignore=DL3008
@@ -18,8 +17,7 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1
 USER 10001:10001
 WORKDIR /work
-# Explicit list (also enforced by the .dockerignore allowlist), root owned so the signer
-# process cannot modify its own code.
+# Explicit file list, root owned: read-only for the signer user.
 COPY build_update.py verify_update.py init-token.sh run-demo.sh /work/
 COPY bastion_update/ /work/bastion_update/
 COPY tests/ /work/tests/

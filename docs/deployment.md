@@ -4,7 +4,7 @@
 flowchart LR
   rel[GitHub release: signed digest] --> prom[promote.ps1: cosign verify identity and issuer]
   prom -->|refuses tags and unsigned digests| overlay[deploy/overlays/dev digest]
-  overlay --> commit[Owner commit and push]
+  overlay --> commit[Commit and pull request]
   commit --> argo[ArgoCD sync, prune, self-heal]
   argo --> psa{Pod Security restricted}
   psa -->|compliant| pod[Pod: UID 65532, read-only root, no capabilities]

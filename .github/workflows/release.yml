@@ -1,8 +1,7 @@
 name: release
 
-# Tag-triggered release (spec items 8 to 10). Every responsibility runs in its own job with its
-# own permissions. Nothing is published until the gate job, which runs in the protected
-# "production" environment, has evaluated all evidence.
+# Tag-triggered release. One job per step, each with its own permissions. Publishing waits for
+# the gate job in the protected "production" environment.
 #
 #   guard -> test -> build (push by digest, sign, SBOM, attest) -> windows -> verify -> gate -> publish
 

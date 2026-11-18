@@ -1,8 +1,7 @@
 name: dast-demo
 
-# Manual only (spec item 7). Starts the pinned OWASP Juice Shop image inside an internal Docker
-# network on the runner, runs a ZAP baseline against it and uploads the report.
-# Juice Shop is never deployed anywhere and no external target is scanned.
+# Manual only. ZAP baseline against a pinned OWASP Juice Shop on an internal Docker network.
+# Nothing is deployed and no external target is scanned.
 
 on:
   workflow_dispatch:

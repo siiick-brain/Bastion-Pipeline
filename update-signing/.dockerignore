@@ -1,5 +1,4 @@
-# Allowlist: only the files the signing container needs reach the build context, so a stray
-# key or token file in this folder can never be copied into the image.
+# Allowlist: only what the signing image needs.
 *
 !requirements.txt
 !bastion_update/

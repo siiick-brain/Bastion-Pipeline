@@ -1,8 +1,7 @@
 name: security
 
-# Pull request security gates (see docs/tool-ownership.md for which tool owns which finding class).
-# SARIF upload and SonarCloud run only for trusted events: fork pull requests get no secrets
-# and no write token.
+# Security gates (tool ownership: docs/tool-ownership.md). SARIF upload and SonarCloud skip
+# fork pull requests, which get no secrets and no write token.
 
 on:
   push:
@@ -165,7 +164,7 @@ jobs:
         if: steps.cfg.outputs.enabled == 'true'
         run: |
           python -m pip install --require-hashes --no-deps --only-binary :all: -r app/requirements-dev.txt
-          # --cov=. gives repo-relative paths; per-package roots make __init__.py ambiguous to SonarCloud.
+          # --cov=. so SonarCloud gets repo-relative paths.
           python -m pytest --cov=. --cov-report=xml:coverage.xml
       - name: SonarCloud scan with quality gate wait
         if: steps.cfg.outputs.enabled == 'true'

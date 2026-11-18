@@ -157,7 +157,7 @@ jobs:
           cache: true
 
       - name: Trivy config gate
-        # Trivy takes a single target. deploy/ is skipped because its rendered output is scanned.
+        # One target only; deploy/ is covered by the rendered overlays.
         run: >-
           trivy config --severity CRITICAL,HIGH,MEDIUM --exit-code 1
           --ignorefile .trivyignore.yaml --skip-dirs deploy .

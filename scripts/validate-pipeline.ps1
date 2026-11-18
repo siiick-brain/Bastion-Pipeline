@@ -55,7 +55,7 @@ try {
     Invoke-Check 'shellcheck' 'shellcheck' { shellcheck -x scripts/hooks/commit-msg scripts/check-authorship.sh scripts/verify-release.sh scripts/zap-scan.sh scripts/lib/commit-policy.sh }
     Invoke-Check 'hadolint' 'hadolint' { hadolint Dockerfile update-signing/Dockerfile infra/jenkins/Dockerfile.agent infra/jenkins/Dockerfile.controller }
     Invoke-Check 'Kustomize render' 'kubectl' { kubectl kustomize deploy/overlays/dev | Out-Null; kubectl kustomize deploy/overlays/prod | Out-Null }
-    # History reachable from HEAD only: other local branches (such as gate-demo/fake-secret) are not scanned.
+    # Only history reachable from HEAD (skips local demo branches).
     Invoke-Check 'Gitleaks (history)' 'gitleaks' { gitleaks git . --log-opts=HEAD --redact --no-banner }
     Invoke-Check 'OSV-Scanner (lock files)' 'osv-scanner' { osv-scanner scan source --config osv-scanner.toml -L app/requirements.txt -L app/requirements-dev.txt -L update-signing/requirements.txt }
     Invoke-Check 'Trivy config' 'trivy' { trivy fs --scanners misconfig,secret --severity CRITICAL,HIGH --exit-code 1 --ignorefile .trivyignore.yaml --skip-dirs .venv,artifacts,zap-out,infra/jenkins/secrets --quiet . }

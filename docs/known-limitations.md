@@ -24,7 +24,7 @@ The `ci`, `security`, `windows` and `oidc-demo` workflows passed on GitHub on 20
 | Local registry | `localhost:5001` is plain HTTP and local only. | Never exposed beyond 127.0.0.1 |
 | Chainguard base | The free tier publishes only `latest`. Digest pinning keeps builds stable; Dependabot proposes updates. | ADR 0004 |
 | Reproducible builds | Not claimed. No byte-for-byte comparison of independent builds. | PLANNED |
-| Dependabot authorship | Dependabot commits are authored by `dependabot[bot]`, which conflicts with the sole-author policy. `check-authorship.sh` exempts them only on `dependabot/*` branches. | Owner decides whether to squash-merge under their own identity |
+| Dependabot authorship | Dependabot commits are authored by `dependabot[bot]`, which conflicts with the sole-author policy. `check-authorship.sh` exempts them only on `dependabot/*` branches. | Dependabot changes are applied as a commit by the project author, through a pull request |
 | Legacy commits | The two commits before the audit do not have Conventional Commit titles. History is not rewritten; CI checks only new commits. | Accepted |
 | Windows | `build.bat` falls back to Windows PowerShell 5.1 when pwsh is absent; the Pester suite needs Pester 5 or later. | Prerequisite check fails clearly |
 

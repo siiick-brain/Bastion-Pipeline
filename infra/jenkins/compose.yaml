@@ -40,8 +40,7 @@ services:
     volumes:
       - ../../:/src:ro
       - agent_work:/home/jenkins/agent
-    # Mask the controller's secrets inside the source mount: a compromised build must not be
-    # able to read the admin password or the controller's SSH private key.
+    # Hide the controller secrets from builds.
     tmpfs:
       - /src/infra/jenkins/secrets:ro,size=1k
     secrets: [agent_ssh_pub, agent_host_key]

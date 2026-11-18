@@ -2,4 +2,4 @@
 LICENSE|*|Standard MIT license text is quoted verbatim.
 tests/style/bad.md|*|Fixture that must fail the style rules.
 CODE_OF_CONDUCT.md|*|Adopted text, quoted verbatim.
-docs/skills-evidence.md|double-dash|Generated report that quotes raw tool output.
+docs/evidence.md|double-dash|Generated report that quotes raw tool output.

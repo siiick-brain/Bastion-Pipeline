@@ -1,6 +1,6 @@
 name: windows
 
-# Windows lint, Pester and packaging (spec item 2). Module versions are pinned.
+# Windows lint, Pester and packaging. Module versions are pinned.
 
 on:
   push:
