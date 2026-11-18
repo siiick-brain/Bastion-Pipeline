@@ -27,4 +27,4 @@ The `gate` job in `.github/workflows/release.yml` runs `python -m scripts.releas
 
 ## Branch protection
 
-`scripts/apply-branch-protection.ps1` manages a `main` ruleset: block deletion and force pushes, require pull requests (0 approvals so a sole maintainer is not locked out), linear history, resolved conversations and the required status checks. It is a dry run by default. With `-Apply` it asks for confirmation, applies the ruleset and reads it back to verify every rule. Dry run on 2026-11-15: PASS (no ruleset exists yet). Apply: NOT VERIFIED (needs the owner's decision).
+`scripts/apply-branch-protection.ps1` manages a `main` ruleset: block deletion and force pushes, require pull requests (0 approvals so a sole maintainer is not locked out), linear history, resolved conversations and the required status checks. It is a dry run by default. With `-Apply` it asks for confirmation, applies the ruleset and reads it back to verify every rule. Applied on 2026-11-17: ruleset 27441845 is active on `main` with 9 required checks (PASS).

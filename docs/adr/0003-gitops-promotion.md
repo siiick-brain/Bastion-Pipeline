@@ -9,7 +9,7 @@ Deployment must use exactly the artifact that was signed and verified. Tags are 
 ## Decision
 
 - Overlays reference `image@sha256:<digest>` only. The committed placeholder digest is all zeros, so nothing runs until a digest is promoted.
-- `scripts/promote.ps1` verifies the signature (exact identity and issuer) before it edits the overlay. It refuses tags. It prints the diff and never commits: the owner commits.
+- `scripts/promote.ps1` verifies the signature (exact identity and issuer) before it edits the overlay. It refuses tags. It prints the diff and never commits; the change goes through a pull request.
 - ArgoCD applies the committed state with automated sync, prune and self-heal.
 - `scripts/verify-deployment.ps1` compares the running pod's image digest with the overlay digest and checks the effective security context from inside the pod.
 
