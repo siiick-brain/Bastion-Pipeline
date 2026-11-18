@@ -2,10 +2,8 @@
 
 ## Next
 
-1. Add `NVD_API_KEY` so the weekly Dependency-Check scan runs.
-2. Open a pull request from a fork to exercise C33.
-3. Apply future Dependabot updates through a pull request under the project author.
-4. Capture the signed-in pages listed in [screenshots](screenshots.md).
+1. Apply future Dependabot updates through a pull request under the project author.
+2. Optional: an `NVD_API_KEY` secret for the weekly Dependency-Check scan.
 
 ## Planned (deferred ideas)
 
