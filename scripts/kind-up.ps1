@@ -84,7 +84,7 @@ if ($WithArgoCD) {
 if ($WithAdmission) {
     Install-PinnedManifest -Name 'kyverno' -Url $versions.KYVERNO_INSTALL_URL -Sha256 $versions.KYVERNO_INSTALL_SHA256 -Namespace 'kyverno'
     Invoke-Native kubectl @('-n', 'kyverno', 'rollout', 'status', 'deploy/kyverno-admission-controller', '--timeout=300s')
-    # Kyverno validates its own policies through a webhook that can lag the rollout by a few seconds.
+    # The Kyverno policy webhook can lag the rollout.
     $policy = Join-Path $repoRoot 'infra/kyverno/require-signed-images.yaml'
     foreach ($attempt in 1..10) {
         & kubectl apply -f $policy

@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-    Proves the admission policy (infra/kyverno/require-signed-images.yaml) admits signed release
-    images and rejects everything else.
+    Checks that the admission policy (infra/kyverno/require-signed-images.yaml) admits signed
+    release images and rejects the rest.
 .DESCRIPTION
     Each case sends a pod to the API server with a server-side dry run, so the admission
     webhooks decide and nothing is created. Every pod meets Pod Security "restricted", so only the

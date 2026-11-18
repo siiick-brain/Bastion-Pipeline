@@ -67,7 +67,7 @@ cosign verify-blob SHA256SUMS --bundle SHA256SUMS.sigstore.json --certificate-id
 | Real Syft SBOMs validate (cyclonedx-cli, pyspdxtools) and a corrupted copy fails | manual run, see [control matrix](control-matrix.md) | 2026-11-15 | PASS |
 | Full release verification of `v0.2.0` | release `verify` job, GitHub release run 43983071969 | 2026-11-16 | PASS (8 controls in `verify.json`) |
 | Independent verification of `v0.2.0` outside CI (steps 1 to 4, tampered checksums, wrong identity) | commands above, cosign 3.1.4, GitHub CLI | 2026-11-17 | PASS (9 checks, both negative cases rejected) |
-| Release `v0.2.1` (image `sha256:dbba11b288a6a0b8d0a556b89fa331a21fdd312ef2d5f77212859a058a6c7916`, commit `e0f153d`) | GitHub release run 44092986387; production approval submitted on the owner's instruction | 2026-11-17 | PASS, gate ALLOWED with SonarCloud PASS |
+| Release `v0.2.1` (image `sha256:dbba11b288a6a0b8d0a556b89fa331a21fdd312ef2d5f77212859a058a6c7916`, commit `e0f153d`) | GitHub release run 44092986387; production approval by the required reviewer | 2026-11-17 | PASS, gate ALLOWED with SonarCloud PASS |
 | Independent verification of `v0.2.1` (signature, SBOM digest binding, attestation, provenance policy, Windows signature; the `v0.2.0` identity is rejected) | commands above | 2026-11-17 | PASS |
 
 ## Reproducible builds

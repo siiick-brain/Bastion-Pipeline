@@ -1,6 +1,5 @@
-// Bastion Pipeline on Jenkins. Implements the pipeline contract stages that need no container
-// runtime (docs/pipeline-contract.md). Container build, signing, provenance and release are
-// owned by GitHub Actions because the Jenkins agent deliberately has no Docker access.
+// Jenkins pipeline: the source stages of docs/pipeline-contract.md. The agent has no Docker,
+// so image build, signing and release stay in GitHub Actions.
 pipeline {
   agent { label 'linux-isolated' }
   options {
@@ -12,7 +11,7 @@ pipeline {
   environment {
     PIP_DISABLE_PIP_VERSION_CHECK = '1'
     PYTHONDONTWRITEBYTECODE = '1'
-    // SSH sessions do not inherit the image ENV, so add the agent's locked tool venv explicitly.
+    // SSH sessions do not inherit the image ENV.
     PATH = "/opt/venv/bin:/usr/local/bin:/usr/bin:/bin"
   }
   stages {
@@ -33,7 +32,7 @@ pipeline {
           }
         }
         sh 'git log -1 --format="commit %H by %an"'
-        // Same rule as GitHub CI: check only commits that are new since the last good state.
+        // Only commits since the last good build.
         sh '''
           base="${GIT_PREVIOUS_SUCCESSFUL_COMMIT:-$(git rev-parse --verify -q origin/main || git rev-parse HEAD~1)}"
           echo "Checking commits in ${base}..HEAD"

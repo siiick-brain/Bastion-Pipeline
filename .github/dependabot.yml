@@ -1,6 +1,5 @@
 version: 2
-# A 7 day cooldown delays adoption of brand-new releases, which limits exposure to a
-# compromised upstream release. Security updates are not delayed by the cooldown.
+# 7-day cooldown against compromised fresh releases. Security updates are not delayed.
 updates:
   - package-ecosystem: pip
     directories: ["/app", "/update-signing"]
@@ -17,7 +16,7 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
-    # Dockerfile.naive is the fixed baseline for the before and after table in docs/hardening.md.
+    # Dockerfile.naive is a fixed baseline (docs/hardening.md).
     ignore:
       - dependency-name: "python"
   - package-ecosystem: github-actions

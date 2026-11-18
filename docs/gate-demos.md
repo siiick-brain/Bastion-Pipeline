@@ -12,6 +12,6 @@
 
 The script requires a clean working tree, uses the configured Git identity (so the commit-msg hook applies) and returns to the starting branch. `-WhatIf` lists the branches without creating them.
 
-The fake key is generated at run time, so the main branch contains no secret pattern. Gitleaks ignores the AWS documentation example keys, which is why a random value is used. `scripts/verify-skills.ps1` proves Gitleaks detects this form (row 9).
+The fake key is generated at run time, so the main branch contains no secret pattern. Gitleaks ignores the AWS documentation example keys, which is why a random value is used. `scripts/collect-evidence.ps1` proves Gitleaks detects this form (row 9).
 
 Gitleaks scans the history reachable from the checked-out commit (`--log-opts=HEAD`), so a pushed `gate-demo/fake-secret` branch turns only its own pull request red and never `main`.

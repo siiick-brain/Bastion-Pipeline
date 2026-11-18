@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    Runs the skills gate (spec item 20) and writes artifacts/skills-report.md and docs/skills-evidence.md.
+    Runs every local check and writes artifacts/evidence-report.md and docs/evidence.md.
 .DESCRIPTION
     Each row runs a real check where one is possible locally. Rows that need a hosted run or a
     manual step report NOT VERIFIED with the cause. With -Strict, only FAIL rows change the exit
     code; NOT VERIFIED rows stay visible in the report.
 .EXAMPLE
-    pwsh -File scripts/verify-skills.ps1 -Strict
+    pwsh -File scripts/collect-evidence.ps1 -Strict
 #>
 [CmdletBinding()]
 param(
@@ -160,13 +160,13 @@ finally { Pop-Location }
 
 $date = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd')
 $counts = $rows | Group-Object Status | ForEach-Object { "$($_.Name): $($_.Count)" }
-$md = @('# Skills evidence', '', "Date: $date. Command: ``pwsh -File scripts/verify-skills.ps1$(if ($Strict) { ' -Strict' })``.", '',
+$md = @('# Evidence report', '', "Date: $date. Command: ``pwsh -File scripts/collect-evidence.ps1$(if ($Strict) { ' -Strict' })``.", '',
     "Summary: $($counts -join ', ').", '', '| # | Gate | Status | Evidence |', '| --- | --- | --- | --- |')
 foreach ($r in $rows) { $md += "| $($r.N) | $($r.Gate) | $($r.Status) | $($r.Evidence) |" }
 $text = ($md -join "`n") + "`n"
 New-Item -ItemType Directory -Force (Join-Path $repoRoot 'artifacts') | Out-Null
-[IO.File]::WriteAllText((Join-Path $repoRoot 'artifacts/skills-report.md'), $text)
-[IO.File]::WriteAllText((Join-Path $repoRoot 'docs/skills-evidence.md'), $text)
+[IO.File]::WriteAllText((Join-Path $repoRoot 'artifacts/evidence-report.md'), $text)
+[IO.File]::WriteAllText((Join-Path $repoRoot 'docs/evidence.md'), $text)
 Write-Host "Summary: $($counts -join ', ')"
 if ($Strict -and ($rows.Status -contains 'FAIL')) { exit 1 }
 exit 0

@@ -1,7 +1,5 @@
-# Admission-time enforcement for the bastion namespace (opt-in: scripts/kind-up.ps1 -WithAdmission).
-# Policy 1 rejects any container image that is not the project image referenced by digest.
-# Policy 2 rejects any project image without a keyless signature from the release workflow on a
-# version tag (the same identity that docs/verify.md and scripts/promote.ps1 check).
+# Admission policies for the bastion namespace (kind-up.ps1 -WithAdmission).
+# 1: only the project image, by digest. 2: signed by release.yml on a version tag.
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy
 metadata:

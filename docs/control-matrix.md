@@ -67,7 +67,7 @@ Requirement, implementation, test, evidence and status. Status words are defined
 | C53 | Provenance subject, workflow, ref, commit, runner | `verify_provenance.py` | `test_verify_provenance.py` (21, real attestation) | | PASS |
 | C54 | Tampered artifact fails | `verify-release.sh` negative controls | `test_modified_blob_fails_signature` | | PASS (local) |
 | C55 | Release gate blocks on FAIL or NOT VERIFIED | `gate.py` | `test_gate.py` (26) | | PASS |
-| C56 | Required reviewer on production | environment `production` | manual | GitHub release run 43983071969: gate waited until the owner approved | PASS |
+| C56 | Required reviewer on production | environment `production` | manual | GitHub release run 43983071969: gate waited until the required reviewer approved | PASS |
 | C57 | Branch ruleset with dry run, confirmation, verification | `apply-branch-protection.ps1` | dry run, then `-Apply` against the real repository | 2026-11-17: ruleset 27441845 `main-protection` active on `refs/heads/main` (deletion, non fast forward, linear history, pull request, 9 required checks) | PASS |
 
 ## OIDC

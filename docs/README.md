@@ -30,4 +30,3 @@
 ## Conventions
 
 - [Writing style](STYLE.md) and [glossary](GLOSSARY.md)
-- [Repository metadata](repo-metadata.md)

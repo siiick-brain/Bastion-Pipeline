@@ -1,9 +1,7 @@
 name: oidc-demo
 
-# Requests a real GitHub OIDC token with a custom audience and verifies it with
-# scripts/oidc/verifier.py against scripts/oidc/policy.toml (spec item 11).
-# No cloud account is involved. Run from main: the policy accepts. Run from any other ref:
-# the policy rejects and the job fails, which demonstrates the denial path.
+# Verifies a real GitHub OIDC token with scripts/oidc/verifier.py and policy.toml.
+# Accepted from main. Any other ref is rejected and the job fails.
 
 on:
   workflow_dispatch:

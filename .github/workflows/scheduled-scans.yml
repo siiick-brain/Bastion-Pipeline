@@ -1,7 +1,7 @@
 name: scheduled-scans
 
-# Weekly deep scans (spec item 6). These are advisory: they open no pull request gate,
-# but a failure turns the scheduled run red and is triaged in docs/exceptions.md.
+# Weekly deep scans. Advisory, not a pull request gate. Accepted findings go in
+# security/exceptions.toml.
 
 on:
   schedule:
@@ -28,9 +28,7 @@ jobs:
       - name: Dependency-Check (NVD key optional)
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        # Without a key the NVD download is rate limited far beyond the job timeout, so the scan is
-        # skipped and reported as NOT VERIFIED. The key reaches the container only as an
-        # environment variable (an empty one is rejected by Dependency-Check as an invalid key).
+        # Needs NVD_API_KEY: without it the NVD download outruns the timeout.
         run: |
           mkdir -p odc-out
           if [ -z "$NVD_API_KEY" ]; then

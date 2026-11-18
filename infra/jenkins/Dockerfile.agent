@@ -1,6 +1,4 @@
-# Isolated build agent. It has no Docker socket and no host mounts other than a read-only
-# copy of the source. Tools are downloaded once at build time and checked against the
-# publishers' SHA-256 checksums.
+# Build agent: no Docker socket, read-only source mount, checksum-verified tools.
 FROM jenkins/ssh-agent:latest-jdk21@sha256:78ade73b7e8ff8b5b84a016f6a1afc9f98362908bf2f43643a42c599a8f3bd1c
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Package versions follow the pinned base image digest; Dependabot bumps the digest.

@@ -6,7 +6,7 @@
     default (exact certificate identity and issuer of the release workflow). -PublicKey is for
     the local kind demonstration where images are signed with a local key.
     The script edits deploy/overlays/<Overlay>/kustomization.yaml and prints the diff. It never
-    commits: the owner reviews and commits the change, and ArgoCD deploys it.
+    commits: the change goes through a pull request, then ArgoCD deploys it.
 .EXAMPLE
     pwsh -File scripts/promote.ps1 -Image ghcr.io/siiick-brain/bastion-pipeline@sha256:... -Tag v0.2.0
 .EXAMPLE
@@ -53,7 +53,7 @@ if ($LASTEXITCODE -ne 0) { throw "cosign verification FAILED for $Image. Nothing
 Write-Host 'Signature verified.'
 
 $text = [System.IO.File]::ReadAllText($kustomization)
-# [ \t] rather than \s: \s also matches line breaks and would eat the final newline.
+# [ \t], not \s: \s would also match the final newline.
 $updated = [regex]::Replace($text, '(?m)^([ \t]*newName:[ \t]*).*$', "`${1}$name")
 $updated = [regex]::Replace($updated, '(?m)^([ \t]*digest:[ \t]*)sha256:[0-9a-f]{64}[ \t]*$', "`${1}$digest")
 if ($updated -notmatch [regex]::Escape($digest)) { throw "Could not find an images digest entry in $kustomization" }

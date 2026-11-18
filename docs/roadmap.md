@@ -1,11 +1,11 @@
 # Roadmap
 
-## Next (needs the owner)
+## Next
 
-1. Check the first weekly run of `scheduled-scans.yml`.
-2. Apply future Dependabot updates through a pull request under the owner identity.
-3. Optional: add `NVD_API_KEY` and a GitLab remote; open a pull request from a fork to exercise C33.
-4. Capture the remaining screenshots in [the screenshot plan](screenshots.md).
+1. Add `NVD_API_KEY` so the weekly Dependency-Check scan runs.
+2. Open a pull request from a fork to exercise C33.
+3. Apply future Dependabot updates through a pull request under the project author.
+4. Capture the signed-in pages listed in [screenshots](screenshots.md).
 
 ## Planned (deferred ideas)
 

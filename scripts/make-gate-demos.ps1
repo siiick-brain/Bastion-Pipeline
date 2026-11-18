@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Creates local throwaway branches that each break one security gate (spec item 17).
+    Creates local throwaway branches that each break one security gate.
 .DESCRIPTION
     Each branch holds one commit with one deliberate violation. Push a branch and open a pull
     request to watch the matching check turn red. Never merge these branches.

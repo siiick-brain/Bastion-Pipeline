@@ -1,4 +1,4 @@
-"""Boot simulation: accepts one valid image and rejects the five attack cases (spec item 16)."""
+"""Boot simulation: accepts one valid image and rejects the five attack cases."""
 
 from __future__ import annotations
 
