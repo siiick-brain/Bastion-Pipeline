@@ -76,7 +76,8 @@ Hosted runs on GitHub on 2026-11-16 and 2026-11-17, local runs on Windows 11 wit
 | Image vulnerabilities, naive versus hardened | `trivy image` 0.76.2 | 15 critical and 491 high versus 0 and 0 ([hardening](docs/hardening.md)) |
 | Signed update suite in SoftHSM container | `update-signing/run-demo.sh` | PASS: 55 tests, counter persists across runs |
 | Jenkins pipeline, isolated agent | `infra/jenkins/run_job.py` | PASS: build 9 |
-| GitLab CI run, pull request from a fork | | NOT VERIFIED ([known limitations](docs/known-limitations.md)) |
+| GitLab CI | GitLab pipeline 3083481172 | PASS: 8 jobs, same source stages as GitHub |
+| Pull request from a fork, Dependency-Check | | NOT VERIFIED ([known limitations](docs/known-limitations.md)) |
 
 ## Quick start
 
