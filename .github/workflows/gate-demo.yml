@@ -1,0 +1,8 @@
+name: gate-demo
+on: workflow_dispatch
+permissions: {}
+jobs:
+  demo:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: aquasecurity/trivy-action@master
