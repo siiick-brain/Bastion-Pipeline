@@ -17,7 +17,7 @@ ENV PYTHONPATH=/deps PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /srv
 COPY --from=build --chown=0:0 --chmod=0755 /home/nonroot/deps /deps
 COPY --from=build --chown=0:0 --chmod=0755 /home/nonroot/out/app /srv/app
-USER 65532:65532
+USER root
 EXPOSE 8000
 ENTRYPOINT ["/usr/bin/python", "-m", "uvicorn", "app.main:app"]
 CMD ["--host", "0.0.0.0", "--port", "8000", "--no-server-header"]
